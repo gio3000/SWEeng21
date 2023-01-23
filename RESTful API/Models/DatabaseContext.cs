@@ -16,6 +16,7 @@ namespace RESTful_API.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("User");

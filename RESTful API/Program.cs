@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Donot forgot to add ConnectionStrings as "dbConnection" to the appsetting.json file
 builder.Services.AddDbContext<DatabaseContext>
-    (options => options.UseSqlServer(builder.Configuration.GetConnectionString("dbConnection")));
+    (options => options.UseMySQL(builder.Configuration.GetConnectionString("dbConnection")));
 builder.Services.AddTransient<IUsers, UserRepository>();
 
 builder.Services.AddControllers();
