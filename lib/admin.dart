@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'alert.dart';
 
 class AdminTechnisch extends StatefulWidget {
   const AdminTechnisch({super.key, required this.title});
@@ -53,7 +54,17 @@ class _Admintechnisch extends State<AdminTechnisch> {
                             width: 25,
                           ),
                           IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return MyAlertDialog(
+                                      text: 'Sektretariat $i',
+                                    );
+                                  },
+                                );
+                              },
                               tooltip: 'Sekretariat entfernen',
                               icon: const Icon(Icons.delete)),
                         ],
