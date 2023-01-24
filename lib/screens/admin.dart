@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'alert.dart';
+import '/screens/alert.dart';
 
-class AdminTechnisch extends StatefulWidget {
-  const AdminTechnisch({super.key, required this.title});
+class TechnicalAdministrator extends StatefulWidget {
+  const TechnicalAdministrator({super.key, required this.title});
   final String title;
   @override
-  State<AdminTechnisch> createState() => _Admintechnisch();
+  State<TechnicalAdministrator> createState() => _TechnicalAdministrator();
 }
 
-class _Admintechnisch extends State<AdminTechnisch> {
+class _TechnicalAdministrator extends State<TechnicalAdministrator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
