@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import '/screens/alert.dart';
+import '../widgets/alert_dialog.dart';
+import '../utils/constants.dart' as constants;
 
-class TechnicalAdministrator extends StatefulWidget {
-  const TechnicalAdministrator({super.key, required this.title});
+class TechnicalAdministratorScreen extends StatefulWidget {
+  const TechnicalAdministratorScreen({super.key, required this.title});
   final String title;
   @override
-  State<TechnicalAdministrator> createState() => _TechnicalAdministrator();
+  State<TechnicalAdministratorScreen> createState() =>
+      _TechnicalAdministrator();
 }
 
-class _TechnicalAdministrator extends State<TechnicalAdministrator> {
+class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: constants.screenBackgroundColor,
         appBar: AppBar(
           title: Text(widget.title),
           actions: [
@@ -49,7 +52,10 @@ class _TechnicalAdministrator extends State<TechnicalAdministrator> {
                           IconButton(
                               onPressed: () {},
                               tooltip: 'Sekretariat bearbeiten',
-                              icon: const Icon(Icons.edit)),
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Colors.black54,
+                              )),
                           const SizedBox(
                             width: 25,
                           ),
@@ -66,7 +72,10 @@ class _TechnicalAdministrator extends State<TechnicalAdministrator> {
                                 );
                               },
                               tooltip: 'Sekretariat entfernen',
-                              icon: const Icon(Icons.delete)),
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.black54,
+                              )),
                         ],
                       ),
                       const Divider(

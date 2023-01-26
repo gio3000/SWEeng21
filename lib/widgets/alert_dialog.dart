@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import '../utils/constants.dart' as constants;
 
 class MyAlertDialog extends StatefulWidget {
   final String text;
@@ -22,6 +23,7 @@ class _MyAlertDialogState extends State<MyAlertDialog> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Container(
+        margin: const EdgeInsets.all(constants.cPadding),
         height: 200,
         width: 300,
         decoration: BoxDecoration(
@@ -31,7 +33,7 @@ class _MyAlertDialogState extends State<MyAlertDialog> {
         child: Column(
           children: <Widget>[
             const Padding(
-              padding: EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(constants.cPadding),
               child: Text(
                 'Sekretariat löschen',
                 style: TextStyle(
@@ -41,22 +43,20 @@ class _MyAlertDialogState extends State<MyAlertDialog> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(constants.cPadding),
               child:
                   Text('Möchten sie das Sekretariat $text wirklich löschen?'),
             ),
             Expanded(
               child: Row(children: [
-                ElevatedButton(
+                TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
                   child: const Text('Abbrechen'),
                 ),
-                const SizedBox(
-                  width: 97,
-                ),
-                ElevatedButton(
+                Spacer(),
+                TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },

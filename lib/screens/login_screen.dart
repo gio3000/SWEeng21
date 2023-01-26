@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../utils/constants.dart' as constants; //maxInputLength, cPadding
 
 class LoginScreen extends StatefulWidget {
+  static const routeName = '/login';
+
   const LoginScreen({super.key});
 
   @override
