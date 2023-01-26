@@ -18,55 +18,26 @@ class _MyAlertDialogState extends State<MyAlertDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Container(
-        margin: const EdgeInsets.all(constants.cPadding),
-        height: 200,
-        width: 300,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
-        ),
-        child: Column(
-          children: <Widget>[
-            const Padding(
-              padding: const EdgeInsets.all(constants.cPadding),
-              child: Text(
-                'Sekretariat löschen',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(constants.cPadding),
-              child:
-                  Text('Möchten sie das Sekretariat $text wirklich löschen?'),
-            ),
-            Expanded(
-              child: Row(children: [
-                TextButton(
+    return AlertDialog(
+        actionsAlignment: MainAxisAlignment.end,
+        title: Text('$text löschen'),
+        content: Text('Soll $text wirklich gelöscht werden?'),
+        actions: [
+          Row(
+            children: [
+              TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Abbrechen'),
-                ),
-                Spacer(),
-                TextButton(
+                  child: const Text('Abbrechen')),
+              const Spacer(),
+              TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Bestätigen'),
-                ),
-              ]),
-            ),
-          ],
-        ),
-      ),
-    );
+                  child: const Text('Bestätigen'))
+            ],
+          )
+        ]);
   }
 }

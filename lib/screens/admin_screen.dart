@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/alert_dialog.dart';
 import '../utils/constants.dart' as constants;
+import '../widgets/admin_list_tile.dart';
 
 class TechnicalAdministratorScreen extends StatefulWidget {
   const TechnicalAdministratorScreen({super.key, required this.title});
@@ -11,6 +12,18 @@ class TechnicalAdministratorScreen extends StatefulWidget {
 }
 
 class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
+  void callAlertScreen(String content) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return MyAlertDialog(
+          text: content,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,49 +53,7 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
                 const Divider(
                   thickness: 5,
                 ),
-                for (int i = 1; i < 8; i++)
-                  (Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text('Sekretariat $i'),
-                          const SizedBox(
-                            width: 1000,
-                          ),
-                          IconButton(
-                              onPressed: () {},
-                              tooltip: 'Sekretariat bearbeiten',
-                              icon: const Icon(
-                                Icons.edit,
-                                color: Colors.black54,
-                              )),
-                          const SizedBox(
-                            width: 25,
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (BuildContext context) {
-                                    return MyAlertDialog(
-                                      text: 'Sektretariat $i',
-                                    );
-                                  },
-                                );
-                              },
-                              tooltip: 'Sekretariat entfernen',
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.black54,
-                              )),
-                        ],
-                      ),
-                      const Divider(
-                        thickness: 5,
-                      )
-                    ],
-                  ))
+                ...List.generate(8, (index) => const AdminListTile())
               ],
             )),
         floatingActionButton: FloatingActionButton(

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class AdminListTile extends StatelessWidget {
   const AdminListTile({super.key});
@@ -9,8 +7,11 @@ class AdminListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: const Text('Sekretariat'),
-      trailing:
-          Row(children: [IconButton(onPressed: () {}, icon: Icon(Icons.abc))]),
+      trailing: Row(children: [
+        IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+        const Spacer(),
+        IconButton(onPressed: () {}, icon: const Icon(Icons.delete))
+      ]),
     );
   }
 }
