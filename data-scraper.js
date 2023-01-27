@@ -1,6 +1,4 @@
 import got from 'got';
-import util from 'util';
-import fs from 'fs';
 
 const login = async (credentials) => {
     const response = await got.post('https://dualis.dhbw.de/scripts/mgrqispi.dll', {
@@ -41,8 +39,8 @@ const getSemesterArguments = async (credentials) => {
     return semesterArguments;
 }
 
-const getModuleArguments = async (credentials, semesterArguments) => {
-    let moduleArguments = [];
+const getModuleData = async (credentials, semesterArguments) => {
+    let moduleData = [];
     for (const semesterArgument of semesterArguments) {
         let url = `https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=COURSERESULTS&ARGUMENTS=${credentials.arguments.slice(0, 2).join(',')},-N${semesterArgument}`;
         const response = await got.get(url, {
@@ -52,22 +50,25 @@ const getModuleArguments = async (credentials, semesterArguments) => {
         });
 
         let modules = response.body.split('<tbody>')[1].split('</tbody>')[0].replaceAll('\t', '').replaceAll('  ', '').split('</tr>');
-        for (const module of modules) {
-            if (module.includes('href')) {
-                moduleArguments.push(module.split('dl_popUp("')[1].split('"')[0]);
+        for (const moduleLine of modules) {
+            if (moduleLine.includes('href')) {
+                let module = {};
+                module.argument = moduleLine.split('dl_popUp("')[1].split('"')[0];
+                module.cts = parseInt(moduleLine.split('"tbdata_numeric">')[1].split('</td>')[0].split(',')[0]);
+                moduleData.push(module);
             }
         }
     }
-
     // Remove duplicates
-    moduleArguments = [...new Set(moduleArguments)];
-    return moduleArguments;
+    // TODO Remove duplicates in a better way
+    moduleData = [...new Set(moduleData)];
+    return moduleData;
 }
 
-const getModules = async (credentials, moduleArguments) => {
+const getModules = async (credentials, moduleData) => {
     let modules = [];
-    for (const moduleArgument of moduleArguments) {
-        let url = `https://dualis.dhbw.de${moduleArgument}`;
+    for (const moduleDataObj of moduleData) {
+        let url = `https://dualis.dhbw.de${moduleDataObj.argument}`;
         const response = await got.get(url, {
             headers: {
                 'Cookie': credentials.cookie
@@ -75,16 +76,21 @@ const getModules = async (credentials, moduleArguments) => {
         });
 
         let module = {};
-        module.name = response.body.split('<h1>')[1].split('&nbsp;\r\n')[1].split(' (')[0];
+        module.modulename = response.body.split('<h1>')[1].split('&nbsp;\r\n')[1].split(' (')[0];
+        module.cts = moduleDataObj.cts;
         module.lectures = [];
+
         let gradeTableRows = response.body.split('<table')[1].split('</table>')[0].replaceAll('\t', '').replaceAll('  ', '').split('</tr>');
         if (gradeTableRows[3].includes('Modulabschlussleistungen')) {
             if (gradeTableRows[5].includes('Gesamt')) {
                 // Modulabschlussleistungen mit nur einer Note
-                let rowColumns = gradeTableRows[4].split('</td>');
                 let lecture = {};
-                lecture.name = module.name;
+                lecture.lecturename = module.modulename;
                 let exam = {};
+                let rowColumns = gradeTableRows[4].split('</td>');
+                if (gradeTableRows[6].includes('Versuch2')) {
+                    rowColumns = gradeTableRows[8].split('</td>');
+                }
                 let gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
                 if (gradeString.includes('noch nicht gesetzt')) {
                     exam = null;
@@ -92,19 +98,20 @@ const getModules = async (credentials, moduleArguments) => {
                 else {
                     exam.semester = rowColumns[0].split('">')[1];
                     exam.countsToAverage = true;
-                    exam.grade = gradeToPercentPoints(parseFloat(gradeString));
+                    exam.grade = gradeStringToPercentPoints(gradeString);
                 }
                 lecture.exam = exam;
                 module.lectures.push(lecture);
             }
             else {
                 // Modulabschlussleistungen mit mehreren Noten
+                // TODO Parsen bei Versuch 2 machen
                 let semester = gradeTableRows[4].split('</td>')[0].split('">')[1];
                 for (let row of gradeTableRows.slice(5)) {
                     if (!row.includes('Gesamt')) {
                         let rowColumns = row.split('</td>');
                         let lecture = {};
-                        lecture.name = rowColumns[1].split('&nbsp;&nbsp;')[1];
+                        lecture.lecturename = rowColumns[1].split('&nbsp;&nbsp;')[1];
                         let exam = {};
                         exam.semester = semester;
                         exam.countsToAverage = true;
@@ -123,29 +130,35 @@ const getModules = async (credentials, moduleArguments) => {
             gradeTableRows = gradeTableRows.slice(3);
             for (let i = 0; i < gradeTableRows.length / 2; i++) {
                 let lecture = {};
-                lecture.name = gradeTableRows[i * 2].split('">')[1].split(' ').slice(1).join(' ').split(' (')[0].split('</td>')[0];
+                lecture.lecturename = gradeTableRows[i * 2].split('">')[1].split(' ').slice(1).join(' ').split(' (')[0].split('</td>')[0];
                 let exam = {};
                 let rowColumns = gradeTableRows[i * 2 + 1].split('</td>');
-                if (rowColumns.length >= 4) {
-                    let gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
-                    if (gradeString.includes('noch nicht gesetzt')) {
-                        exam = null;
+                if (rowColumns.length > 1) {
+                    if (rowColumns[0].includes('Versuch2')) {
+                        module.lectures = [];
                     }
                     else {
-                        exam.semester = rowColumns[0].split('">')[1];
-                        if (gradeString.includes('b')) {
-                            // TODO Modul/Prüfungsleistung ist bestanden aber hat keine Note, wird also nicht bewertet
-                            exam.countsToAverage = false;
-                            exam.grade = 50;
+                        let gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
+                        if (gradeString.includes('noch nicht gesetzt')) {
+                            exam = null;
                         }
                         else {
-                            let weightage = parseInt(rowColumns[1].split('(')[1].split('%)')[0]);
-                            exam.countsToAverage = weightage > 0;
-                            exam.grade = gradeToPercentPoints(parseFloat(rowColumns[3].replaceAll('\r\n', '').split('>')[1])) * weightage / 100;
+                            exam.semester = rowColumns[0].split('">')[1];
+                            if (gradeString.includes('b')) {
+                                // Modul/Prüfungsleistung ist bestanden aber hat keine Note, wird also nicht bewertet
+                                // TODO Besseren Weg finden um festzuhalten
+                                exam.countsToAverage = false;
+                                exam.grade = 50;
+                            }
+                            else {
+                                const weightage = parseInt(rowColumns[1].split('(')[1].split('%)')[0]);
+                                exam.countsToAverage = weightage > 0;
+                                exam.grade = Math.round(gradeStringToPercentPoints(gradeString) * weightage / 100);
+                            }
                         }
+                        lecture.exam = exam;
+                        module.lectures.push(lecture);
                     }
-                    lecture.exam = exam;
-                    module.lectures.push(lecture);
                 }
             }
         }
@@ -154,7 +167,7 @@ const getModules = async (credentials, moduleArguments) => {
     return modules;
 }
 
-const gradeToPercentPoints = (grade) => {
+const gradeStringToPercentPoints = (gradeString) => {
     const gradeConversion = {
         1.0: 100,
         1.1: 97,
@@ -198,16 +211,16 @@ const gradeToPercentPoints = (grade) => {
         4.9: 36,
         5.0: 34
     }
+    const grade = parseFloat(gradeString.replace(',', '.'))
     return gradeConversion[grade];
 }
 
 const fetch = async (credentials) => {
     credentials = await login(credentials);
     const semesterArguments = await getSemesterArguments(credentials);
-    const moduleArguments = await getModuleArguments(credentials, semesterArguments);
-    const modules = await getModules(credentials, moduleArguments);
-    console.log(util.inspect(modules, false, null, true /* enable colors */));
-    fs.writeFileSync('modules.json', JSON.stringify(modules, null, 2));
+    const moduleData = await getModuleData(credentials, semesterArguments);
+    const modules = await getModules(credentials, moduleData);
+    return modules;
 }
 
 export default fetch;
