@@ -96,8 +96,8 @@ namespace RESTful_API.Models
             // Secretary table
             modelBuilder.Entity<Secretary>(entity =>
             {
-                entity.ToTable("Secretar");
-                entity.Property(e => e.SecretaryID).HasColumnName("SecretarID");
+                entity.ToTable("Secretary");
+                entity.Property(e => e.SecretaryID).HasColumnName("SecretaryID");
                 entity.Property(e => e.UserID).IsUnicode(false);
                 entity.Property(e => e.Name).HasMaxLength(40).IsUnicode(true); 
             });
