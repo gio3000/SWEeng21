@@ -18,6 +18,7 @@ namespace RESTful_API.Models
         public virtual DbSet<Exam> Exams { get; set; }
         public virtual DbSet<Lecture> Lectures { get; set; }
         public virtual DbSet<Module> Modules { get; set; }
+        public virtual DbSet<Secretary> Secretarys { get; set; }
         public virtual DbSet<Student> Students { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,36 +46,36 @@ namespace RESTful_API.Models
             modelBuilder.Entity<Admin>().HasOne<User>().WithMany().HasForeignKey(e => e.UserID);
 
             // Course table
-            modelBuilder.Entity<Course>(enitiy =>
+            modelBuilder.Entity<Course>(entity =>
             {
-                enitiy.ToTable("Course");
-                enitiy.Property(e => e.CourseID).HasColumnName("CourseID");
-                enitiy.Property(e => e.CourseName).HasMaxLength(10).IsUnicode(true);
+                entity.ToTable("Course");
+                entity.Property(e => e.CourseID).HasColumnName("CourseID");
+                entity.Property(e => e.CourseName).HasMaxLength(10).IsUnicode(true);
             });
 
             // CourseModuleRel table
 
             // Exam table
-            modelBuilder.Entity<Exam>(enitiy =>
+            modelBuilder.Entity<Exam>(entity =>
             {
-                enitiy.ToTable("Exam");
-                enitiy.Property(e => e.ExamID).HasColumnName("ExamID");
-                enitiy.Property(e => e.LectureID).IsUnicode(false);
-                enitiy.Property(e => e.StudentID).IsUnicode(false);
-                enitiy.Property(e => e.Grade).IsUnicode(false);
-                enitiy.Property(e => e.Semester).HasMaxLength(20).IsUnicode(true);
-                enitiy.Property(e => e.CountToAverage).IsUnicode(false);
+                entity.ToTable("Exam");
+                entity.Property(e => e.ExamID).HasColumnName("ExamID");
+                entity.Property(e => e.LectureID).IsUnicode(false);
+                entity.Property(e => e.StudentID).IsUnicode(false);
+                entity.Property(e => e.Grade).IsUnicode(false);
+                entity.Property(e => e.Semester).HasMaxLength(20).IsUnicode(true);
+                entity.Property(e => e.CountToAverage).IsUnicode(false);
             });
             modelBuilder.Entity<Exam>().HasOne<Lecture>().WithMany().HasForeignKey(e => e.LectureID);
             modelBuilder.Entity<Exam>().HasOne<Student>().WithMany().HasForeignKey(e => e.StudentID);
 
             // Lecture table
-            modelBuilder.Entity<Lecture>(enitiy =>
+            modelBuilder.Entity<Lecture>(entity =>
             {
-                enitiy.ToTable("Lecture");
-                enitiy.Property(e => e.LectureID).HasColumnName("LectureID");
-                enitiy.Property(e => e.ModuleID).IsUnicode(false);
-                enitiy.Property(e => e.LectureName).HasMaxLength(40).IsUnicode(true);
+                entity.ToTable("Lecture");
+                entity.Property(e => e.LectureID).HasColumnName("LectureID");
+                entity.Property(e => e.ModuleID).IsUnicode(false);
+                entity.Property(e => e.LectureName).HasMaxLength(40).IsUnicode(true);
             });
             modelBuilder.Entity<Lecture>().HasOne<Module>().WithMany().HasForeignKey(e => e.ModuleID);
 
@@ -83,25 +84,32 @@ namespace RESTful_API.Models
             // LecturerLectureRel table
 
             // Module table
-            modelBuilder.Entity<Module>(enitiy =>
+            modelBuilder.Entity<Module>(entity =>
             {
-                enitiy.ToTable("Module");
-                enitiy.Property(e => e.ModuleID).HasColumnName("ModuleID");
-                enitiy.Property(e => e.ModuleName).HasMaxLength(40).IsUnicode(true);
-                enitiy.Property(e => e.CTS).IsUnicode(false);
-                enitiy.Property(e => e.Status).HasMaxLength(20).IsUnicode(true);
+                entity.ToTable("Module");
+                entity.Property(e => e.ModuleID).HasColumnName("ModuleID");
+                entity.Property(e => e.ModuleName).HasMaxLength(40).IsUnicode(true);
+                entity.Property(e => e.CTS).IsUnicode(false);
+                entity.Property(e => e.Status).HasMaxLength(20).IsUnicode(true);
             });
 
             // Secretary table
+            modelBuilder.Entity<Secretary>(entity =>
+            {
+                entity.ToTable("Secretar");
+                entity.Property(e => e.SecretaryID).HasColumnName("SecretarID");
+                entity.Property(e => e.UserID).IsUnicode(false);
+                entity.Property(e => e.Name).HasMaxLength(40).IsUnicode(true); 
+            });
 
             // Student table
-            modelBuilder.Entity<Student>(enitiy =>
+            modelBuilder.Entity<Student>(entity =>
             {
-                enitiy.ToTable("Student");
-                enitiy.Property(e => e.StudentID).HasColumnName("StudentID");
-                enitiy.Property(e => e.CourseID).IsUnicode(false);
-                enitiy.Property(e => e.UserID).IsUnicode(false);
-                enitiy.Property(e => e.MatriculationNr).IsUnicode(false);
+                entity.ToTable("Student");
+                entity.Property(e => e.StudentID).HasColumnName("StudentID");
+                entity.Property(e => e.CourseID).IsUnicode(false);
+                entity.Property(e => e.UserID).IsUnicode(false);
+                entity.Property(e => e.MatriculationNr).IsUnicode(false);
             });
             modelBuilder.Entity<Student>().HasOne<User>().WithMany().HasForeignKey(e => e.UserID);
             modelBuilder.Entity<Student>().HasOne<Course>().WithMany().HasForeignKey(e => e.CourseID);
