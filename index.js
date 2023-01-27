@@ -3,4 +3,4 @@ import fs from 'fs';
 
 const credentials = JSON.parse(fs.readFileSync('credentials.json', 'utf8'));
 
-await fetch(credentials)
+await fetch(credentials);

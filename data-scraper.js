@@ -91,6 +91,7 @@ const getModules = async (credentials, moduleArguments) => {
                 }
                 else {
                     exam.semester = rowColumns[0].split('">')[1];
+                    exam.countsToAverage = true;
                     exam.grade = gradeToPercentPoints(parseFloat(gradeString));
                 }
                 lecture.exam = exam;
@@ -106,6 +107,7 @@ const getModules = async (credentials, moduleArguments) => {
                         lecture.name = rowColumns[1].split('&nbsp;&nbsp;')[1];
                         let exam = {};
                         exam.semester = semester;
+                        exam.countsToAverage = true;
                         exam.grade = parseInt(rowColumns[3].split('> ')[1].split('<')[0].split(',')[0]);
                         lecture.exam = exam;
                         module.lectures.push(lecture);
@@ -119,10 +121,9 @@ const getModules = async (credentials, moduleArguments) => {
         else {
             // Modul mit mehreren getrennten Vorlesungen
             gradeTableRows = gradeTableRows.slice(3);
-            // console.log(gradeTableRows)
             for (let i = 0; i < gradeTableRows.length / 2; i++) {
                 let lecture = {};
-                lecture.name = gradeTableRows[i * 2].split('">')[1].split(' (')[0].split('</td>')[0];
+                lecture.name = gradeTableRows[i * 2].split('">')[1].split(' ').slice(1).join(' ').split(' (')[0].split('</td>')[0];
                 let exam = {};
                 let rowColumns = gradeTableRows[i * 2 + 1].split('</td>');
                 if (rowColumns.length >= 4) {
@@ -133,15 +134,18 @@ const getModules = async (credentials, moduleArguments) => {
                     else {
                         exam.semester = rowColumns[0].split('">')[1];
                         if (gradeString.includes('b')) {
+                            // TODO Modul/Prüfungsleistung ist bestanden aber hat keine Note, wird also nicht bewertet
+                            exam.countsToAverage = false;
                             exam.grade = 50;
                         }
                         else {
-                            exam.grade = gradeToPercentPoints(parseFloat(rowColumns[3].replaceAll('\r\n', '').split('>')[1]));
-
+                            let weightage = parseInt(rowColumns[1].split('(')[1].split('%)')[0]);
+                            exam.countsToAverage = weightage > 0;
+                            exam.grade = gradeToPercentPoints(parseFloat(rowColumns[3].replaceAll('\r\n', '').split('>')[1])) * weightage / 100;
                         }
-                        lecture.exam = exam;
-                        module.lectures.push(lecture);
                     }
+                    lecture.exam = exam;
+                    module.lectures.push(lecture);
                 }
             }
         }
