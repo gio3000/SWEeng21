@@ -15,8 +15,11 @@ namespace RESTful_API.Models
         public virtual DbSet<User>? Users { get; set; }
         public virtual DbSet<Admin> Admins { get; set; }
         public virtual DbSet<Course> Courses { get; set; }
+        public virtual DbSet<CourseModuleRel> CourseModuleRels { get; set; }
         public virtual DbSet<Exam> Exams { get; set; }
         public virtual DbSet<Lecture> Lectures { get; set; }
+        public virtual DbSet<Lecturer> Lecturers { get; set; }
+        public virtual DbSet<LecturerLectureRel> LecturerLectureRels { get; set; }
         public virtual DbSet<Module> Modules { get; set; }
         public virtual DbSet<Secretary> Secretarys { get; set; }
         public virtual DbSet<Student> Students { get; set; }
@@ -54,6 +57,14 @@ namespace RESTful_API.Models
             });
 
             // CourseModuleRel table
+            modelBuilder.Entity<CourseModuleRel>(entity =>
+            {
+                entity.ToTable("CourseModuleRel");
+                entity.Property(e => e.CourseID).HasColumnName("CourseID");
+                entity.Property(e => e.ModuleID).HasColumnName("CourseID");
+            });
+            modelBuilder.Entity<CourseModuleRel>().HasOne<Course>().WithMany().HasForeignKey(e => e.CourseID);
+            modelBuilder.Entity<CourseModuleRel>().HasOne<Module>().WithMany().HasForeignKey(e => e.ModuleID);
 
             // Exam table
             modelBuilder.Entity<Exam>(entity =>
@@ -80,8 +91,23 @@ namespace RESTful_API.Models
             modelBuilder.Entity<Lecture>().HasOne<Module>().WithMany().HasForeignKey(e => e.ModuleID);
 
             // Lecturer table
+            modelBuilder.Entity<Lecturer>(entity =>
+            {
+                entity.ToTable("Lecturer");
+                entity.Property(e => e.LecturerID).HasColumnName("LecturerID");
+                entity.Property(e => e.UserID).IsUnicode(false);
+            });
+            modelBuilder.Entity<Lecturer>().HasOne<User>().WithMany().HasForeignKey(e => e.UserID);
 
             // LecturerLectureRel table
+            modelBuilder.Entity<LecturerLectureRel>(entity =>
+            {
+                entity.ToTable("LecturerLectureRel");
+                entity.Property(e => e.LecturerID).HasColumnName("LecturerID");
+                entity.Property(e => e.LectureID).HasColumnName("LectureID");
+            });
+            modelBuilder.Entity<LecturerLectureRel>().HasOne<Lecturer>().WithMany().HasForeignKey(e => e.LecturerID);
+            modelBuilder.Entity<LecturerLectureRel>().HasOne<Lecture>().WithMany().HasForeignKey(e => e.LectureID);
 
             // Module table
             modelBuilder.Entity<Module>(entity =>
