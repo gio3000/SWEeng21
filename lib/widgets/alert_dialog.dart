@@ -19,6 +19,7 @@ class _MyAlertDialogState extends State<MyAlertDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+        contentPadding: const EdgeInsets.all(constants.cPadding),
         actionsAlignment: MainAxisAlignment.end,
         title: Text('$text löschen'),
         content: Text('Soll $text wirklich gelöscht werden?'),

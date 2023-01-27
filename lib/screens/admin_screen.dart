@@ -12,6 +12,14 @@ class TechnicalAdministratorScreen extends StatefulWidget {
 }
 
 class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
+  late List<Widget> secretarys = List<Widget>.generate(
+      10,
+      (index) => AdminListTile(
+            index: index + 1,
+            callAlert: callAlertScreen,
+            changeExpansion: changeExpansion,
+          ));
+
   void callAlertScreen(String content) {
     showDialog(
       context: context,
@@ -22,6 +30,13 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
         );
       },
     );
+  }
+
+  bool changeExpansion(bool expanded) {
+    setState(() {
+      expanded = !expanded;
+    });
+    return expanded;
   }
 
   @override
@@ -39,7 +54,8 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
         ),
         body: Padding(
             padding: const EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
-            child: Column(
+            child: SingleChildScrollView(
+                child: Column(
               children: [
                 const Text(
                   'Sekretariate',
@@ -53,9 +69,9 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
                 const Divider(
                   thickness: 5,
                 ),
-                ...List.generate(8, (index) => const AdminListTile())
+                for (int i = 0; i < secretarys.length; i++) (secretarys[i])
               ],
-            )),
+            ))),
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
           tooltip: 'Sekretariat hinzufügen',
