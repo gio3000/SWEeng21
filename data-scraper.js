@@ -1,4 +1,5 @@
 import got from 'got';
+import { gradeStringToPercentPoints, removeModuleDataDuplicates } from './helper.js';
 
 const login = async (credentials) => {
     const response = await got.post('https://dualis.dhbw.de/scripts/mgrqispi.dll', {
@@ -60,8 +61,7 @@ const getModuleData = async (credentials, semesterArguments) => {
         }
     }
     // Remove duplicates
-    // TODO Remove duplicates in a better way
-    moduleData = [...new Set(moduleData)];
+    moduleData = removeModuleDataDuplicates(moduleData);
     return moduleData;
 }
 
@@ -165,54 +165,6 @@ const getModules = async (credentials, moduleData) => {
         modules.push(module);
     }
     return modules;
-}
-
-const gradeStringToPercentPoints = (gradeString) => {
-    const gradeConversion = {
-        1.0: 100,
-        1.1: 97,
-        1.2: 95,
-        1.3: 93,
-        1.4: 92,
-        1.5: 90,
-        1.6: 89,
-        1.7: 87,
-        1.8: 86,
-        1.9: 84,
-        2.0: 82,
-        2.1: 81,
-        2.2: 79,
-        2.3: 77,
-        2.4: 76,
-        2.5: 74,
-        2.6: 73,
-        2.7: 71,
-        2.8: 70,
-        2.9: 68,
-        3.0: 66,
-        3.1: 65,
-        3.2: 63,
-        3.3: 61,
-        3.4: 60,
-        3.5: 58,
-        3.6: 57,
-        3.7: 55,
-        3.8: 54,
-        3.9: 52,
-        4.0: 50,
-        4.1: 49,
-        4.2: 47,
-        4.3: 45,
-        4.4: 44,
-        4.5: 42,
-        4.6: 41,
-        4.7: 39,
-        4.8: 38,
-        4.9: 36,
-        5.0: 34
-    }
-    const grade = parseFloat(gradeString.replace(',', '.'))
-    return gradeConversion[grade];
 }
 
 const fetch = async (credentials) => {
