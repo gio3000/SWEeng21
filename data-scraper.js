@@ -22,7 +22,7 @@ const login = async (credentials) => {
 }
 
 const getSemesterArguments = async (credentials) => {
-    let url = `https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=COURSERESULTS&ARGUMENTS=${credentials.arguments.join(',')}`;
+    const url = `https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=COURSERESULTS&ARGUMENTS=${credentials.arguments.join(',')}`;
     const response = await got.get(url, {
         headers: {
             'Cookie': credentials.cookie
@@ -42,14 +42,16 @@ const getSemesterArguments = async (credentials) => {
 
 const getModuleData = async (credentials, semesterArguments) => {
     let moduleData = [];
-    for (const semesterArgument of semesterArguments) {
-        let url = `https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=COURSERESULTS&ARGUMENTS=${credentials.arguments.slice(0, 2).join(',')},-N${semesterArgument}`;
-        const response = await got.get(url, {
+    const requests = semesterArguments.map(semesterArgument => {
+        const url = `https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=COURSERESULTS&ARGUMENTS=${credentials.arguments.slice(0, 2).join(',')},-N${semesterArgument}`;
+        return got.get(url, {
             headers: {
                 'Cookie': credentials.cookie
             }
         });
-
+    });
+    const responses = await Promise.all(requests);
+    for (const response of responses) {
         let modules = response.body.split('<tbody>')[1].split('</tbody>')[0].replaceAll('\t', '').replaceAll('  ', '').split('</tr>');
         for (const moduleLine of modules) {
             if (moduleLine.includes('href')) {
@@ -67,17 +69,20 @@ const getModuleData = async (credentials, semesterArguments) => {
 
 const getModules = async (credentials, moduleData) => {
     let modules = [];
-    for (const moduleDataObj of moduleData) {
-        let url = `https://dualis.dhbw.de${moduleDataObj.argument}`;
-        const response = await got.get(url, {
+    const requests = moduleData.map(moduleDataObj => {
+        const url = `https://dualis.dhbw.de${moduleDataObj.argument}`;
+        return got.get(url, {
             headers: {
                 'Cookie': credentials.cookie
             }
         });
-
+    });
+    const responses = await Promise.all(requests);
+    for (let i = 0; i < responses.length; i++) {
+        const response = responses[i];
         let module = {};
         module.modulename = response.body.split('<h1>')[1].split('&nbsp;\r\n')[1].split(' (')[0];
-        module.cts = moduleDataObj.cts;
+        module.cts = moduleData[i].cts;
         module.lectures = [];
 
         let gradeTableRows = response.body.split('<table')[1].split('</table>')[0].replaceAll('\t', '').replaceAll('  ', '').split('</tr>');

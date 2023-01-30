@@ -11,10 +11,12 @@ This is a simple api to get your grades from the [Dualis](https://dualis.dhbw.de
 Currently a credentals.json is needed with the following structure:
 
 ```json
-{
-  "username": "username",
-  "password": "password",
-  "cookie": "",
-  "arguments": ""
-}
+[
+  {
+    "username": "username",
+    "password": "password",
+    "cookie": "",
+    "arguments": ""
+  }
+]
 ```

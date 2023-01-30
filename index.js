@@ -2,28 +2,20 @@ import fetch from './data-scraper.js';
 import util from 'util';
 import fs from 'fs';
 
-const credentialsJanik = JSON.parse(fs.readFileSync('credentialsJanik.json', 'utf8'));
-const credentialsTimo = JSON.parse(fs.readFileSync('credentialsTimo.json', 'utf8'));
-const credentialsJustin = JSON.parse(fs.readFileSync('credentialsJustin.json', 'utf8'));
+const credentials = JSON.parse(fs.readFileSync('credentials.json', 'utf8'));
 
+const requests = credentials.map(credentials => fetch(credentials));
+const modules = await Promise.all(requests);
 
-const modulesJanik = await fetch(credentialsJanik);
-const modulesTimo = await fetch(credentialsTimo);
-const modulesJustin = await fetch(credentialsJustin);
+for (let module of modules) {
+    console.log(util.inspect(module, false, null, true /* enable colors */));
+}
 
+fs.writeFileSync('modules.json', JSON.stringify(modules, null, 2));
 
-console.log(util.inspect(modulesJanik, false, null, true /* enable colors */));
-console.log(util.inspect(modulesTimo, false, null, true /* enable colors */));
-console.log(util.inspect(modulesJustin, false, null, true /* enable colors */));
-
-fs.writeFileSync('modulesJanik.json', JSON.stringify(modulesJanik, null, 2));
-fs.writeFileSync('modulesTimo.json', JSON.stringify(modulesTimo, null, 2));
-fs.writeFileSync('modulesJustin.json', JSON.stringify(modulesJustin, null, 2));
-
-
-for (let module of modulesJanik) {
+for (let module of modules[0]) {
     let found = false;
-    for (let module1 of modulesTimo) {
+    for (let module1 of modules[1]) {
         if (module.name == module1.name) {
             found = true;
             break;
@@ -37,4 +29,5 @@ for (let module of modulesJanik) {
     }
 }
 
-console.log(modulesJanik.length === modulesTimo.length && modulesJanik.length === modulesJustin.length);
+
+console.log(modules[0].length === modules[1].length && modules[0].length === modules[2].length);
