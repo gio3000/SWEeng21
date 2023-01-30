@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/alert_dialog.dart';
+import '../widgets/alert_dialog_delete_secretariat.dart';
 import '../utils/constants.dart' as constants;
 import '../widgets/admin_list_tile.dart';
 
@@ -13,34 +13,62 @@ class TechnicalAdministratorScreen extends StatefulWidget {
 }
 
 class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
+  Map<int, String> newNames = {};
+
+  ///Map to save index of widget and secretariats name
+
+  ///generates initial List with Secretariats while no database connection exists
   late List<Widget> secretariats = List<Widget>.generate(
       10,
       (index) => AdminListTile(
-            key: Key(index.toString()),
+            key: ValueKey(index),
             index: index + 1,
-            callAlert: callAlertScreen,
+            callAlert: callDeleteAlert,
+            name: 'Sekretariat ${index + 1}',
+            addNewNameToMap: addNewNameToMap,
           ));
 
-  void callAlertScreen(String content, int index) {
+  ///calls AlertDialog if delete button pressed
+  void callDeleteAlert(String content, int index) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return MyAlertDialog(
           text: content,
-          removeSecretary: removeSecretry,
+          removeSecretary: removeSecretariat,
           index: index,
         );
       },
     );
   }
 
-  void removeSecretry(int index) {
+  ///removes Secretariat from List
+  void removeSecretariat(int index) {
     setState(() {
-      final String key = (index - 1).toString();
-      final keyToRemove = Key(key); // Key of the item to remove
+      final int key = index - 1;
+      final keyToRemove = ValueKey(key);
       secretariats.removeWhere((item) => item.key == keyToRemove);
     });
+  }
+
+  /// add New Seccretariat to List
+  void addSecretariat() {
+    setState(() {
+      int newIndex = secretariats.length;
+      AdminListTile newSec = AdminListTile(
+          key: Key(newIndex.toString()),
+          index: newIndex + 1,
+          callAlert: callDeleteAlert,
+          name: 'Sekretariat ${newIndex + 1}',
+          addNewNameToMap: addNewNameToMap);
+      secretariats.add(newSec);
+    });
+  }
+
+  ///saves index and new name to Map so it can be saved to database from Map
+  void addNewNameToMap(int index, String name) {
+    newNames[index] = name;
   }
 
   @override
@@ -78,7 +106,9 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
               ],
             ))),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            addSecretariat();
+          },
           tooltip: 'Sekretariat hinzufügen',
           child: const Icon(Icons.add),
         ));
