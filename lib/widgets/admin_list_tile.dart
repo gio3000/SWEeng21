@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 class AdminListTile extends StatefulWidget {
   final int index;
   final Function callAlert;
-  final Function changeExpansion;
-  const AdminListTile(
-      {super.key,
-      required this.index,
-      required this.callAlert,
-      required this.changeExpansion});
+  const AdminListTile({
+    super.key,
+    required this.index,
+    required this.callAlert,
+  });
 
   @override
   State<AdminListTile> createState() => _AdminListTileState();
@@ -43,7 +42,8 @@ class _AdminListTileState extends State<AdminListTile> {
                 const Spacer(),
                 ElevatedButton(
                     onPressed: () {
-                      widget.callAlert('Sekretariat ${widget.index}');
+                      widget.callAlert(
+                          'Sekretariat ${widget.index}', widget.index);
                     },
                     child: Text('Löschen'))
               ],

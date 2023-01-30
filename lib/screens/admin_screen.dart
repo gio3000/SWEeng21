@@ -13,31 +13,34 @@ class TechnicalAdministratorScreen extends StatefulWidget {
 }
 
 class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
-  late List<Widget> secretarys = List<Widget>.generate(
+  late List<Widget> secretariats = List<Widget>.generate(
       10,
       (index) => AdminListTile(
+            key: Key(index.toString()),
             index: index + 1,
             callAlert: callAlertScreen,
-            changeExpansion: changeExpansion,
           ));
 
-  void callAlertScreen(String content) {
+  void callAlertScreen(String content, int index) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return MyAlertDialog(
           text: content,
+          removeSecretary: removeSecretry,
+          index: index,
         );
       },
     );
   }
 
-  bool changeExpansion(bool expanded) {
+  void removeSecretry(int index) {
     setState(() {
-      expanded = !expanded;
+      final String key = (index - 1).toString();
+      final keyToRemove = Key(key); // Key of the item to remove
+      secretariats.removeWhere((item) => item.key == keyToRemove);
     });
-    return expanded;
   }
 
   @override
@@ -71,7 +74,7 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
                 const Divider(
                   thickness: 5,
                 ),
-                for (int i = 0; i < secretarys.length; i++) (secretarys[i])
+                for (int i = 0; i < secretariats.length; i++) (secretariats[i])
               ],
             ))),
         floatingActionButton: FloatingActionButton(

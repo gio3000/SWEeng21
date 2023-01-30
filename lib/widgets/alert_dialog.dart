@@ -5,7 +5,13 @@ import '../utils/constants.dart' as constants;
 
 class MyAlertDialog extends StatefulWidget {
   final String text;
-  const MyAlertDialog({super.key, required this.text});
+  final Function removeSecretary;
+  final int index;
+  const MyAlertDialog(
+      {super.key,
+      required this.text,
+      required this.removeSecretary,
+      required this.index});
 
   @override
   // ignore: no_logic_in_create_state
@@ -35,6 +41,7 @@ class _MyAlertDialogState extends State<MyAlertDialog> {
               TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
+                    widget.removeSecretary(widget.index);
                   },
                   child: const Text('Bestätigen'))
             ],
