@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/admin_screen.dart';
 import '../utils/constants.dart' as constants; //maxInputLength, cPadding
 
 class LoginScreen extends StatefulWidget {
@@ -136,6 +137,10 @@ class _LoginScreenState extends State<LoginScreen> {
       _isTryingToLogin = false;
       //TODO check whether login was successful
     });
+    if (!mounted) return;
+    Navigator.of(context).pushReplacementNamed(
+        TechnicalAdministratorScreen.routeName,
+        arguments: 'Test lool');
   }
 
   ///validates the username text input field syntax

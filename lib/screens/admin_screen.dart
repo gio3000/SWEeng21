@@ -4,8 +4,9 @@ import '../utils/constants.dart' as constants;
 import '../widgets/admin_list_tile.dart';
 
 class TechnicalAdministratorScreen extends StatefulWidget {
-  const TechnicalAdministratorScreen({super.key, required this.title});
-  final String title;
+  static const routeName = '/technical-admin';
+
+  const TechnicalAdministratorScreen({super.key});
   @override
   State<TechnicalAdministratorScreen> createState() =>
       _TechnicalAdministrator();
@@ -44,7 +45,8 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     return Scaffold(
         backgroundColor: constants.screenBackgroundColor,
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text(
+              ModalRoute.of(context)?.settings.arguments as String? ?? 'Admin'),
           actions: [
             IconButton(
                 onPressed: () {},

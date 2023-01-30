@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/provider/authorization_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/login_screen.dart';
 import 'screens/admin_screen.dart';
@@ -13,13 +15,22 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'DHBW Studierendenverwaltungssystem',
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
+    return ChangeNotifierProvider<AuthorizationProvider>.value(
+      value: AuthorizationProvider(),
+      builder: (context, child) => MaterialApp(
+        title: 'DHBW Studierendenverwaltungssystem',
+        theme: ThemeData(
+          primarySwatch: Colors.deepOrange,
+        ),
+        // home: const LoginScreen(),
+        // home: const TechnicalAdministratorScreen(title: 'Startseite'),
+        initialRoute: LoginScreen.routeName,
+        routes: {
+          LoginScreen.routeName: (context) => const LoginScreen(),
+          TechnicalAdministratorScreen.routeName: (context) =>
+              const TechnicalAdministratorScreen(),
+        },
       ),
-      //home: const LoginScreen(),
-      home: const TechnicalAdministratorScreen(title: 'Startseite'),
     );
   }
 }
