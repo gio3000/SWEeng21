@@ -20,6 +20,8 @@ class AddSecretaryDialog extends StatefulWidget {
 class AddSecretaryDialogState extends State<AddSecretaryDialog> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  ///calls necessary functions in admin_scrren to save information about new secreiat
   void saveNewSecretariat() {
     widget.addSecretariat(widget.index, _nameController.text);
     widget.addPassword(widget.index, _passwordController.text);
