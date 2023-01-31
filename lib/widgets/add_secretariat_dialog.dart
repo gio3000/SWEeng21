@@ -1,60 +1,80 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart' as constants;
 
-class CreateSecretary extends StatefulWidget {
+class AddSecretaryDialog extends StatefulWidget {
+  final int index;
+  final Function addPassword;
   final Function addSecretariat;
-  const CreateSecretary({super.key, required this.addSecretariat});
+  final Function addToList;
+  const AddSecretaryDialog(
+      {super.key,
+      required this.index,
+      required this.addPassword,
+      required this.addSecretariat,
+      required this.addToList});
 
   @override
-  State<CreateSecretary> createState() => _CreateSecretaryState();
+  State<AddSecretaryDialog> createState() => AddSecretaryDialogState();
 }
 
-class _CreateSecretaryState extends State<CreateSecretary> {
+class AddSecretaryDialogState extends State<AddSecretaryDialog> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Dialog(
-        child: Padding(
-            padding: const EdgeInsets.all(3 * constants.cPadding),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.5,
-              height: MediaQuery.of(context).size.height * 0.5,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Text(
-                    'Sekretariat hinzufügen',
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  const Spacer(),
-                  const Text('Name eingeben'),
-                  TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                        label: Text('Name'),
-                        hintText: 'Name des neuen Sekretariats eingeben'),
-                  ),
-                  const Spacer(),
-                  const Text('Passwort eingeben'),
-                  TextField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(
-                        label: Text('Passwort'),
-                        hintText: 'Passwort des neuen Sekretariats eingeben'),
-                  ),
-                  const Spacer(),
-                  const SizedBox(height: 15),
-                  ElevatedButton(
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.2,
+        height: MediaQuery.of(context).size.height * 0.25,
+        padding: const EdgeInsets.all(constants.cPadding),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Sekretariat hinzufügen',
+                style: TextStyle(fontSize: 25)),
+            const Spacer(),
+            TextField(
+              maxLength: 60,
+
+              ///TODO Namenslänge festlegen
+              controller: _nameController,
+              decoration: const InputDecoration(
+                  hintText: 'Name des Sekretariats eingeben',
+                  label: Text('Name')),
+            ),
+            const Spacer(),
+            TextField(
+                controller: _passwordController,
+                maxLength: 60,
+
+                ///TODO PasswortLänge festelgene
+                decoration: const InputDecoration(
+                    hintText: 'Passwort des Sekretariats eingeben',
+                    label: Text('Passwort'))),
+            const Spacer(),
+            Row(
+              children: [
+                ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context);
-                      widget.addSecretariat();
+                      Navigator.of(context).pop();
                     },
-                    child: const Text('Speichern'),
-                  ),
-                ],
-              ),
-            )));
+                    child: const Text('Abbrechen')),
+                const Spacer(),
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      widget.addSecretariat(widget.index, _nameController.text);
+                      widget.addPassword(
+                          widget.index, _passwordController.text);
+                      widget.addToList(_nameController.text);
+                    },
+                    child: const Text('Speichern'))
+              ],
+            )
+          ],
+        ),
+      ),
+    );
   }
 }

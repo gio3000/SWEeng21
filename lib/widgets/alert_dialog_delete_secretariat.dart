@@ -4,31 +4,34 @@ import 'package:flutter/material.dart';
 import '../utils/constants.dart' as constants;
 
 class MyAlertDialog extends StatefulWidget {
-  final String text;
   final Function removeSecretary;
   final int index;
+  final String name;
   const MyAlertDialog(
       {super.key,
-      required this.text,
       required this.removeSecretary,
-      required this.index});
+      required this.index,
+      required this.name});
 
   @override
   // ignore: no_logic_in_create_state
-  _MyAlertDialogState createState() => _MyAlertDialogState(text);
+  _MyAlertDialogState createState() => _MyAlertDialogState();
 }
 
 class _MyAlertDialogState extends State<MyAlertDialog> {
-  final String text;
-  _MyAlertDialogState(this.text);
+  _MyAlertDialogState();
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
         contentPadding: const EdgeInsets.all(constants.cPadding),
         actionsAlignment: MainAxisAlignment.end,
-        title: Text('$text löschen'),
-        content: Text('Soll $text wirklich gelöscht werden?'),
+        title: Text('${widget.name} löschen'),
+
+        ///+1 um die Anzeige übereinstimmend zu halten
+        content: Text('Soll ${widget.name} wirklich gelöscht werden?'),
+
+        ///+1 um die Anzeige übereinstimmend zu halten
         actions: [
           Row(
             children: [

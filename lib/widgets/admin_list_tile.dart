@@ -5,19 +5,21 @@ class AdminListTile extends StatefulWidget {
   final Function callAlert;
   final String name;
   final Function addNewNameToMap;
+  final Function addChangedNameToList;
   const AdminListTile(
       {super.key,
       required this.index,
       required this.callAlert,
       required this.name,
-      required this.addNewNameToMap});
+      required this.addNewNameToMap,
+      required this.addChangedNameToList});
 
   @override
   State<AdminListTile> createState() => _AdminListTileState();
 }
 
 class _AdminListTileState extends State<AdminListTile> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
   bool isExpanded = false;
 
@@ -31,18 +33,18 @@ class _AdminListTileState extends State<AdminListTile> {
   ///this function changes Secretary name
   void changeTitle() {
     setState(() {
-      secretaryName = _controller.text;
+      secretaryName = _nameController.text;
     });
   }
 
   ///calls the addNewNameToMap-function from admin_screen
   void addNameToMap(int index) {
-    widget.addNewNameToMap(index - 1, _controller.text);
+    widget.addNewNameToMap(index - 1, _nameController.text);
   }
 
   ///handles the state of the bool value of saveButtonEnabled
   void checkSaveButtonEnabled() {
-    if (_controller.text != "") {
+    if (_nameController.text != "") {
       saveButtonEnabled = true;
     } else {
       saveButtonEnabled = false;
@@ -61,7 +63,10 @@ class _AdminListTileState extends State<AdminListTile> {
               children: [
                 Expanded(
                     child: TextField(
-                  controller: _controller,
+                  maxLength: 60,
+
+                  ///TODO Namenslänge definieren
+                  controller: _nameController,
                   decoration: InputDecoration(
                     hintText: secretaryName,
                     label: const Text('Name'),
@@ -71,16 +76,6 @@ class _AdminListTileState extends State<AdminListTile> {
                   }),
                 )),
                 const Spacer(),
-                Expanded(
-                    child: TextField(
-                  controller: _controller,
-                  decoration: const InputDecoration(
-                    label: Text('Password'),
-                  ),
-                  onChanged: (value) => setState(() {
-                    checkSaveButtonEnabled();
-                  }),
-                )),
                 const Spacer(),
                 ElevatedButton(
                     onPressed: () {},
@@ -91,6 +86,8 @@ class _AdminListTileState extends State<AdminListTile> {
                         ? () {
                             changeTitle();
                             addNameToMap(widget.index);
+                            widget.addChangedNameToList(
+                                widget.index, _nameController.text);
                           }
                         : null,
                     child: const Text('Speichern')),
