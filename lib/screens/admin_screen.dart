@@ -38,14 +38,17 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     );
   }
 
+//adds passowrd to map so it can be stored to database
   void addPasswordToMap(int inedx, String password) {
     passwords[inedx] = password;
   }
 
+  ///returns name of secretariat
   String getName(int index) {
     return secretariatsNames[index];
   }
 
+  ///opens the Dialog-Window to add new secretariat
   void callAddDialog(int ind) {
     showDialog(
       context: context,
@@ -80,6 +83,7 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     newNames[index] = name;
   }
 
+  ///updates name in list when name changed
   void changeNameInList(int index, String newName) {
     setState(() {
       secretariatsNames[index] = newName;
