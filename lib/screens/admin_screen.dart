@@ -14,6 +14,7 @@ class TechnicalAdministratorScreen extends StatefulWidget {
 
 class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   Map<int, String> newNames = {};
+  int key = 10;
 
   ///Map to save index of widget and secretariats name
 
@@ -58,11 +59,12 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
       int newIndex = secretariats.length;
       AdminListTile newSec = AdminListTile(
           key: Key(newIndex.toString()),
-          index: newIndex + 1,
+          index: key + 1,
           callAlert: callDeleteAlert,
-          name: 'Sekretariat ${newIndex + 1}',
+          name: 'Sekretariat ${key + 1}',
           addNewNameToMap: addNewNameToMap);
       secretariats.add(newSec);
+      key++;
     });
   }
 
