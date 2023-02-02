@@ -8,10 +8,10 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginScreen> createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passwordFieldFocus = FocusNode();
   bool _isTryingToLogin = false; //false if in registration mode
@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           label: Text('Benutzername'),
                           hintText: 'max-it21@it.dhbw-ravensburg.de',
                         ),
-                        validator: _validateUsernameInput,
+                        validator: validateUsernameInput,
                         //if finished typing, change focus to password input field
                         onFieldSubmitted: (_) => FocusScope.of(context)
                             .requestFocus(_passwordFieldFocus),
@@ -70,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           label: Text('Passwort'),
                           hintText: 'Passwort hier eingeben',
                         ),
-                        validator: _validatePasswordInput,
+                        validator: validatePasswordInput,
                       ),
                       const SizedBox(
                         height: 50,
@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
   ///validates the username text input field syntax
   ///returns the [error message] if syntax is not correct
   ///returns `null` if the syntax is correct
-  String? _validateUsernameInput(String? inputValue) {
+  String? validateUsernameInput(String? inputValue) {
     inputValue ??= ''; // if inputValue is null set to empty string
 
     //check for max length
@@ -160,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return null;
   }
 
-  String? _validatePasswordInput(String? inputValue) {
+  String? validatePasswordInput(String? inputValue) {
     inputValue ??= '';
     if (inputValue.length > constants.cMaxInputLength) {
       return 'Zu viele Zeichen!';
