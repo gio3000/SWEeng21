@@ -33,7 +33,7 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
     return Dialog(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.2,
-        height: MediaQuery.of(context).size.height * 0.25,
+        height: MediaQuery.of(context).size.height * 0.37,
         padding: const EdgeInsets.all(constants.cPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -41,7 +41,6 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
           children: [
             const Text('Sekretariat hinzufügen',
                 style: TextStyle(fontSize: 25)),
-            const Spacer(),
             TextField(
               maxLength: 60,
 
@@ -51,7 +50,6 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
                   hintText: 'Name des Sekretariats eingeben',
                   label: Text('Name')),
             ),
-            const Spacer(),
             TextField(
                 controller: _passwordController,
                 maxLength: 60,
