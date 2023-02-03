@@ -30,12 +30,12 @@ namespace RESTful_API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> Get(int id)
         {
-            var employees = await Task.FromResult(_IUser.GetUser(id));
-            if (employees == null)
+            var users = await Task.FromResult(_IUser.GetUser(id));
+            if (users == null)
             {
                 return NotFound();
             }
-            return Ok(employees);
+            return Ok(users);
         }
 
         // POST api/user
@@ -76,8 +76,8 @@ namespace RESTful_API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<User>> Delete(int id)
         {
-            var employee = _IUser.DeleteUser(id);
-            return Ok(await Task.FromResult(employee));
+            var user = _IUser.DeleteUser(id);
+            return Ok(await Task.FromResult(user));
         }
 
         private bool UserExists(int id)

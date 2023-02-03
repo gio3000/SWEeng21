@@ -5,10 +5,10 @@ namespace RESTful_API.Interface
     public interface IAdmin
     {
         public List<Admin> GetÁdmins();
-        public User GetAdmin(int id);
-        public void AddAdmin(User user);
-        public void UpdateAdmin(User user);
-        public User DeleteAdmin(int id);
+        public Admin GetAdmin(int id);
+        public void AddAdmin(Admin admin);
+        public void UpdateAdmin(Admin admin);
+        public Admin DeleteAdmin(int id);
         public bool CheckAdmin(int id);
     }
 }

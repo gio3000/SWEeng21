@@ -5,10 +5,10 @@ namespace RESTful_API.Interface
     public interface IModule
     {
         public List<Module> GetModules();
-        public User GetModule(int id);
-        public void AddModule(User user);
-        public void UpdateModule(User user);
-        public User DeleteModule(int id);
+        public Module GetModule(int id);
+        public void AddModule(Module module);
+        public void UpdateModule(Module module);
+        public Module DeleteModule(int id);
         public bool CheckModule(int id);
     }
 }
