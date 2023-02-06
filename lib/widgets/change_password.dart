@@ -10,12 +10,18 @@ class ChangePassowrd extends StatefulWidget {
 }
 
 class _ChangePassowrdState extends State<ChangePassowrd> {
+  ///Controller for old password
   final TextEditingController _oldPasswordController = TextEditingController();
+
+  ///Controller for new password first input
   final TextEditingController _newPasswordFirstController =
       TextEditingController();
+
+  ///Controller for new password second input
   final TextEditingController _newPasswordSecondController =
       TextEditingController();
 
+  ///calls saveNewPasswordMethod from admin_screen
   void saveNewPassword() {
     widget.saveNewPassword(_oldPasswordController.text,
         _newPasswordFirstController.text, _newPasswordSecondController.text);
