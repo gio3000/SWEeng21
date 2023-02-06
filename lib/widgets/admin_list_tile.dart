@@ -6,13 +6,15 @@ class AdminListTile extends StatefulWidget {
   final String name;
   final Function addNewNameToMap;
   final Function addChangedNameToList;
+  final Function resetPassword;
   const AdminListTile(
       {super.key,
       required this.index,
       required this.callAlert,
       required this.name,
       required this.addNewNameToMap,
-      required this.addChangedNameToList});
+      required this.addChangedNameToList,
+      required this.resetPassword});
 
   @override
   State<AdminListTile> createState() => _AdminListTileState();
@@ -78,7 +80,9 @@ class _AdminListTileState extends State<AdminListTile> {
                 const Spacer(),
                 const Spacer(),
                 ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      widget.resetPassword(widget.index);
+                    },
                     child: const Text('Passwort zurücksetzen')),
                 const Spacer(),
                 ElevatedButton(

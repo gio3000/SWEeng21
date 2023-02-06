@@ -15,11 +15,17 @@ class TechnicalAdministratorScreen extends StatefulWidget {
 }
 
 class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
+  ///Map to save index of widget and secretariats name
   Map<int, String> newNames = {};
+
+  ///Map to save index of widget and secretariats password
   Map<int, String> passwords = {};
+
+  ///String to save the new Password
   late String newPassword;
 
-  ///Map to save index of widget and secretariats name
+  ///List with secretariats which passwords have been reseted
+  List<int> secretaryWithResetedPassword = [];
 
   ///generates initial List with Secretariats while no database connection exists
   List<String> secretariatsNames =
@@ -50,13 +56,16 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     return secretariatsNames[index];
   }
 
-  void setNewPassword(String oldPwd, String newPwdOne, String newPwdTwo) {
+  ///sets new Password so it can be transfered to Database
+  void setNewPassword(
+      String oldPwd, String newPwdOne, String newPwdTwo, int index) {
     ///TODO check if old pwd is correct
     if (newPwdOne == newPwdTwo) {
       newPassword = newPwdOne;
     }
   }
 
+  ///calls Dialog to change Password
   void callChangePasswordDialog() {
     showDialog(
       context: context,
@@ -109,6 +118,11 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     });
   }
 
+  ///adds index of secretariat to List so it can be pushed to Database
+  void resetPassword(int index) {
+    secretaryWithResetedPassword.add(index);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,6 +164,7 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
                     name: secretariatsNames[index],
                     addNewNameToMap: addNewNameToMap,
                     addChangedNameToList: changeNameInList,
+                    resetPassword: resetPassword,
                   ),
                   itemCount: secretariatsNames.length,
                 ),
