@@ -3,6 +3,7 @@ import '../widgets/alert_dialog_delete_secretariat.dart';
 import '../utils/constants.dart' as constants;
 import '../widgets/admin_list_tile.dart';
 import '../widgets/add_secretariat_dialog.dart';
+import '../widgets/change_password.dart';
 
 class TechnicalAdministratorScreen extends StatefulWidget {
   static const routeName = '/technical-admin';
@@ -16,6 +17,7 @@ class TechnicalAdministratorScreen extends StatefulWidget {
 class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   Map<int, String> newNames = {};
   Map<int, String> passwords = {};
+  late String newPassword;
 
   ///Map to save index of widget and secretariats name
 
@@ -46,6 +48,23 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   ///returns name of secretariat
   String getName(int index) {
     return secretariatsNames[index];
+  }
+
+  void setNewPassword(String oldPwd, String newPwdOne, String newPwdTwo) {
+    ///TODO check if old pwd is correct
+    if (newPwdOne == newPwdTwo) {
+      newPassword = newPwdOne;
+    }
+  }
+
+  void callChangePasswordDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ChangePassowrd(saveNewPassword: setNewPassword);
+      },
+    );
   }
 
   ///opens the Dialog-Window to add new secretariat
@@ -99,7 +118,9 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
               ModalRoute.of(context)?.settings.arguments as String? ?? 'Admin'),
           actions: [
             IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  callChangePasswordDialog();
+                },
                 tooltip: 'Passwort ändern',
                 icon: const Icon(Icons.more_vert))
           ],
