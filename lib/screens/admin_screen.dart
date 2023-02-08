@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/alert_dialog_delete_secretariat.dart';
+import '../widgets/delete_secretariat_dialog.dart';
 import '../utils/constants.dart' as constants;
 import '../widgets/admin_list_tile.dart';
 import '../widgets/add_secretariat_dialog.dart';
