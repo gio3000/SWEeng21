@@ -8,16 +8,16 @@ namespace RESTful_API.Repository
     {
         readonly DatabaseContext _dbContext = new();
 
-        public AdminRepository(DatabaseContext dbContext) 
-        { 
+        public AdminRepository(DatabaseContext dbContext)
+        {
             _dbContext = dbContext;
         }
 
-        public List<User> GetAdmins()
+        public List<Admin> GetAdmins()
         {
             try
             {
-                return _dbContext.Users.ToList();
+                return _dbContext.Admins.Include(u => u.UserID).ToList();
             }
             catch
             {
@@ -25,14 +25,14 @@ namespace RESTful_API.Repository
             }
         }
 
-        public User GetAdmin(int id)
+        public Admin GetAdmin(int id)
         {
             try
             {
-                User? user = _dbContext.Users.Find(id);
-                if (user != null)
+                Admin? admin = _dbContext.Admins.Include(u => u.UserID).Single(a => a.AdminID == id);
+                if (admin != null)
                 {
-                    return user;
+                    return admin;
                 }
                 else
                 {
@@ -45,11 +45,11 @@ namespace RESTful_API.Repository
             }
         }
 
-        public void AddUser(User user)
+        public void AddAdmin(Admin admin)
         {
             try
             {
-                _dbContext.Users.Add(user);
+                _dbContext.Admins.Add(admin);
                 _dbContext.SaveChanges();
             }
             catch
@@ -58,11 +58,11 @@ namespace RESTful_API.Repository
             }
         }
 
-        public void UpdateUser(User user)
+        public void UpdateAdmin(Admin admin)
         {
             try
             {
-                _dbContext.Entry(user).State = EntityState.Modified;
+                _dbContext.Entry(admin).State = EntityState.Modified;
                 _dbContext.SaveChanges();
             }
             catch
@@ -71,17 +71,17 @@ namespace RESTful_API.Repository
             }
         }
 
-        public User DeleteUser(int id)
+        public Admin DeleteAdmin(int id)
         {
             try
             {
-                User? user = _dbContext.Users.Find(id);
+                Admin? admin = _dbContext.Admins.Single(a => a.AdminID == id);
 
-                if (user != null)
+                if (admin != null)
                 {
-                    _dbContext.Users.Remove(user);
+                    _dbContext.Admins.Remove(admin);
                     _dbContext.SaveChanges();
-                    return user;
+                    return admin;
                 }
                 else
                 {
@@ -94,9 +94,9 @@ namespace RESTful_API.Repository
             }
         }
 
-        public bool CheckUser(int id)
+        public bool CheckAdmin(int id)
         {
-            return _dbContext.Users.Any(e => e.UserID == id);
+            return _dbContext.Admins.Any(e => e.AdminID == id);
         }
     }
 }

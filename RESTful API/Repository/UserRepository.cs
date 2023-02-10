@@ -30,7 +30,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-                User? user = _dbContext.Users.Find(id);
+                User? user = _dbContext.Users.Single(u => u.UserID == id);
                 if (user != null)
                 {
                     return user;
@@ -76,7 +76,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-                User? user = _dbContext.Users.Find(id);
+                User? user = _dbContext.Users.Single(u => u.UserID == id);
 
                 if (user != null)
                 {

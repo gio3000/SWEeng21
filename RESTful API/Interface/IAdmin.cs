@@ -4,7 +4,7 @@ namespace RESTful_API.Interface
 {
     public interface IAdmin
     {
-        public List<Admin> GetÁdmins();
+        public List<Admin> GetAdmins();
         public Admin GetAdmin(int id);
         public void AddAdmin(Admin admin);
         public void UpdateAdmin(Admin admin);
