@@ -13,6 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 //Donot forgot to add ConnectionStrings as "dbConnection" to the appsetting.json file
 builder.Services.AddDbContext<DatabaseContext>
     (options => options.UseMySQL(builder.Configuration.GetConnectionString("dbConnection")));
+
+// Interface and Repository Mapping
+builder.Services.AddTransient<IAdmin, AdminRepository>();
 builder.Services.AddTransient<IUsers, UserRepository>();
 
 builder.Services.AddControllers();

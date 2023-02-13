@@ -35,7 +35,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-                Module? module = _dbContext.Modules.Single(m => m.CourseID == id);
+                Module? module = _dbContext.Modules.Single(m => m.ModuleID == id);
 
                 if (module != null)
                 {

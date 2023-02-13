@@ -9,5 +9,7 @@
         public string? Password { get; set; }
         public string? Salt { get; set; }
         public int Hash_Count { get; set; }
+
+        public List<Admin>? Admins { get; set; }
     }
 }

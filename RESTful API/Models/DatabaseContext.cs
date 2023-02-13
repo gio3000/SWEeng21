@@ -46,7 +46,10 @@ namespace RESTful_API.Models
                 entity.Property(e => e.AdminID).HasColumnName("AdminID");
                 entity.Property(e => e.UserID).IsUnicode(false);
             });
-            modelBuilder.Entity<Admin>().HasOne<User>().WithMany().HasForeignKey(e => e.UserID);
+            modelBuilder.Entity<Admin>()
+                .HasOne(u => u.User)
+                .WithMany(a => a.Admins)
+                .HasForeignKey(a => a.UserID);
 
             // Course table
             modelBuilder.Entity<Course>(entity =>
@@ -60,8 +63,9 @@ namespace RESTful_API.Models
             modelBuilder.Entity<CourseModuleRel>(entity =>
             {
                 entity.ToTable("CourseModuleRel");
+                entity.HasNoKey();
                 entity.Property(e => e.CourseID).HasColumnName("CourseID");
-                entity.Property(e => e.ModuleID).HasColumnName("CourseID");
+                entity.Property(e => e.ModuleID).HasColumnName("ModuleID");
             });
             modelBuilder.Entity<CourseModuleRel>().HasOne<Course>().WithMany().HasForeignKey(e => e.CourseID);
             modelBuilder.Entity<CourseModuleRel>().HasOne<Module>().WithMany().HasForeignKey(e => e.ModuleID);
@@ -103,6 +107,7 @@ namespace RESTful_API.Models
             modelBuilder.Entity<LecturerLectureRel>(entity =>
             {
                 entity.ToTable("LecturerLectureRel");
+                entity.HasNoKey();
                 entity.Property(e => e.LecturerID).HasColumnName("LecturerID");
                 entity.Property(e => e.LectureID).HasColumnName("LectureID");
             });

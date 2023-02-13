@@ -17,7 +17,9 @@ namespace RESTful_API.Repository
         {
             try
             {
-                return _dbContext.Admins.Include(u => u.UserID).ToList();
+                return _dbContext.Admins
+                    .Include(u => u.UserID)
+                    .ToList();
             }
             catch
             {
@@ -29,7 +31,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-                Admin? admin = _dbContext.Admins.Include(u => u.UserID).Single(a => a.AdminID == id);
+                Admin? admin = _dbContext.Admins.Include(a => a.UserID).Single(a => a.AdminID == id);
                 if (admin != null)
                 {
                     return admin;
@@ -96,7 +98,7 @@ namespace RESTful_API.Repository
 
         public bool CheckAdmin(int id)
         {
-            return _dbContext.Admins.Any(e => e.AdminID == id);
+            return _dbContext.Admins.Any(a => a.AdminID == id);
         }
     }
 }
