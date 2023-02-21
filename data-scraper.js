@@ -89,21 +89,20 @@ const getModules = async (credentials, moduleData) => {
         if (gradeTableRows[3].includes('Modulabschlussleistungen')) {
             if (gradeTableRows[5].includes('Gesamt')) {
                 // Modulabschlussleistungen mit nur einer Note
+                let rowColumns = gradeTableRows[4].split('</td>');
                 let lecture = {};
                 lecture.lecturename = module.modulename;
+                lecture.semester = rowColumns[0].split('">')[1];
+                lecture.countsToAverage = true;
                 let exam = {};
-                let rowColumns = gradeTableRows[4].split('</td>');
+                let gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
+                exam.first_try = gradeStringToPercentPoints(gradeString);
+                exam.second_try = null;
+                exam.third_try = null;
                 if (gradeTableRows[6].includes('Versuch2')) {
                     rowColumns = gradeTableRows[8].split('</td>');
-                }
-                let gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
-                if (gradeString.includes('noch nicht gesetzt')) {
-                    exam = null;
-                }
-                else {
-                    exam.semester = rowColumns[0].split('">')[1];
-                    exam.countsToAverage = true;
-                    exam.grade = gradeStringToPercentPoints(gradeString);
+                    gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
+                    exam.second_try = gradeStringToPercentPoints(gradeString);
                 }
                 lecture.exam = exam;
                 module.lectures.push(lecture);
@@ -117,10 +116,12 @@ const getModules = async (credentials, moduleData) => {
                         let rowColumns = row.split('</td>');
                         let lecture = {};
                         lecture.lecturename = rowColumns[1].split('&nbsp;&nbsp;')[1];
+                        lecture.semester = semester;
+                        lecture.countsToAverage = true;
                         let exam = {};
-                        exam.semester = semester;
-                        exam.countsToAverage = true;
-                        exam.grade = parseInt(rowColumns[3].split('> ')[1].split('<')[0].split(',')[0]);
+                        exam.first_try = parseInt(rowColumns[3].split('>')[1].split('<')[0].split(',')[0]);
+                        exam.second_try = null;
+                        exam.third_try = null;
                         lecture.exam = exam;
                         module.lectures.push(lecture);
                     }
@@ -132,39 +133,60 @@ const getModules = async (credentials, moduleData) => {
         }
         else {
             // Modul mit mehreren getrennten Vorlesungen
+            // TODO Parsen von Versuch 2 machen
             gradeTableRows = gradeTableRows.slice(3);
+            let tryCount = 1;
             for (let i = 0; i < gradeTableRows.length / 2; i++) {
+                // Check if lecture already exists when multiple tries
+                let found = false;
                 let lecture = {};
                 lecture.lecturename = gradeTableRows[i * 2].split('">')[1].split(' ').slice(1).join(' ').split(' (')[0].split('</td>')[0];
                 let exam = {};
                 let rowColumns = gradeTableRows[i * 2 + 1].split('</td>');
+                if (tryCount >= 2) {
+                    module.lectures.forEach(lectureElem => {
+                        if (lectureElem.lecturename === lecture.lecturename) {
+                            lecture = lectureElem;
+                            exam = lecture.exam;
+                            found = true;
+                        }
+                    });
+                }
                 if (rowColumns.length > 1) {
+                    lecture.semester = rowColumns[0].split('">')[1];
                     if (rowColumns[0].includes('Versuch2')) {
-                        module.lectures = [];
+                        tryCount = 2;
                     }
                     else {
                         let gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
-                        if (gradeString.includes('noch nicht gesetzt')) {
-                            exam = null;
+                        const weightage = parseInt(rowColumns[1].split('(')[1].split('%)')[0]);
+                        lecture.countsToAverage = weightage > 0;
+                        let grade = gradeStringToPercentPoints(gradeString, weightage);
+                        if (tryCount === 1 || !found || exam.first_try === grade) {
+                            exam.first_try = grade;
+                            exam.second_try = null;
+                            exam.third_try = null;
                         }
-                        else {
-                            exam.semester = rowColumns[0].split('">')[1];
-                            if (gradeString.includes('b')) {
-                                // Modul/Prüfungsleistung ist bestanden aber hat keine Note, wird also nicht bewertet
-                                // TODO Besseren Weg finden um festzuhalten
-                                exam.countsToAverage = false;
-                                exam.grade = 50;
-                            }
-                            else {
-                                const weightage = parseInt(rowColumns[1].split('(')[1].split('%)')[0]);
-                                exam.countsToAverage = weightage > 0;
-                                exam.grade = Math.round(gradeStringToPercentPoints(gradeString) * weightage / 100);
-                            }
+                        else if (tryCount === 2) {
+                            exam.second_try = grade;
+                        }
+                        if (gradeString.includes('b')) {
+                            // Modul/Prüfungsleistung ist bestanden aber hat keine Note, wird also nicht bewertet
+                            // TODO Besseren Weg finden um festzuhalten
+                            lecture.countsToAverage = false;
                         }
                         lecture.exam = exam;
-                        module.lectures.push(lecture);
+                        if (tryCount === 1) {
+                            module.lectures.push(lecture);
+                        }
                     }
                 }
+            }
+        }
+        // set countsToAverage to false if module is not graded
+        if (module.cts === 0) {
+            for (let lecture of module.lectures) {
+                lecture.countsToAverage = false;
             }
         }
         modules.push(module);

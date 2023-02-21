@@ -1,9 +1,9 @@
 /**
  * Converts gradeString to percent points
  * @param {string} gradeString 
- * @returns percent points of gradeString
+ * @returns percent points of gradeString or null if grade is not set
  */
-const gradeStringToPercentPoints = (gradeString) => {
+const gradeStringToPercentPoints = (gradeString, weightage = 100) => {
     const gradeConversion = {
         1.0: 100,
         1.1: 97,
@@ -47,8 +47,14 @@ const gradeStringToPercentPoints = (gradeString) => {
         4.9: 36,
         5.0: 34
     }
+    if (gradeString.includes('noch nicht gesetzt')) {
+        return null;
+    }
+    if (gradeString.includes('b')) {
+        return 50;
+    }
     const grade = parseFloat(gradeString.replace(',', '.'))
-    return gradeConversion[grade];
+    return Math.round(gradeConversion[grade] * weightage / 100);
 }
 
 /**
