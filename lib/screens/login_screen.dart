@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/admin_screen.dart';
+import 'package:frontend/screens/student_screen.dart';
 import '../utils/constants.dart' as constants; //maxInputLength, cPadding
 
 class LoginScreen extends StatefulWidget {
@@ -49,6 +49,7 @@ class LoginScreenState extends State<LoginScreen> {
                     children: [
                       //username input field
                       TextFormField(
+                        maxLength: constants.cMaxInputLength,
                         textInputAction: TextInputAction.next,
                         decoration: const InputDecoration(
                           label: Text('Benutzername'),
@@ -63,6 +64,7 @@ class LoginScreenState extends State<LoginScreen> {
 
                       //password input field
                       TextFormField(
+                        maxLength: constants.cMaxInputLength,
                         focusNode: _passwordFieldFocus,
                         textInputAction: TextInputAction.done,
                         obscureText: true,
@@ -71,6 +73,7 @@ class LoginScreenState extends State<LoginScreen> {
                           hintText: 'Passwort hier eingeben',
                         ),
                         validator: validatePasswordInput,
+                        onFieldSubmitted: (_) => _submitData(),
                       ),
                       const SizedBox(
                         height: 50,
@@ -138,9 +141,8 @@ class LoginScreenState extends State<LoginScreen> {
       //TODO check whether login was successful
     });
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed(
-        TechnicalAdministratorScreen.routeName,
-        arguments: 'Test lool');
+    Navigator.of(context)
+        .pushReplacementNamed(StudentScreen.routeName, arguments: 'Test lool');
   }
 
   ///validates the username text input field syntax

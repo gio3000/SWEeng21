@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:frontend/errors/authorization_exception.dart';
+import 'package:frontend/models/grade.dart';
 import 'package:http/http.dart' as http;
 
 class AuthorizationProvider with ChangeNotifier {
@@ -29,5 +30,41 @@ class AuthorizationProvider with ChangeNotifier {
     final response = await http
         .post(url, headers: {'Authorization': 'Bearer $_authorizationToken'});
     return json.decode(response.body);
+  }
+
+  Future<List<GradeSubjectMapper>> getGradesFrom(String token) async {
+    await Future.delayed(const Duration(seconds: 1));
+    // return [];
+    //TODO
+    return <GradeSubjectMapper>[
+      GradeSubjectMapper(
+        subjectName: "Systemnahe Programmierung",
+        grade: 1.6,
+        examDate: DateTime.now(),
+      ),
+      GradeSubjectMapper(
+          subjectName: "Theoretische Informatik I",
+          grade: 4.8,
+          examDate: DateTime.now()),
+      GradeSubjectMapper(
+        subjectName: "WebEngineering",
+        grade: 3.2,
+        examDate: DateTime.now(),
+      ),
+      GradeSubjectMapper(
+        subjectName: "Analysis",
+        grade: 5.0,
+        examDate: DateTime.now(),
+      ),
+      GradeSubjectMapper(
+        subjectName: "Datenbanken",
+        grade: 1.8,
+        examDate: DateTime.now(),
+      ),
+    ];
+  }
+
+  void logout() {
+    //TODO
   }
 }

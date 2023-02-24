@@ -40,7 +40,7 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
           children: [
             const Text('Passowrt ändern', style: TextStyle(fontSize: 25)),
             TextField(
-              maxLength: 60,
+              maxLength: constants.cMaxInputLength,
               controller: _oldPasswordController,
               decoration: const InputDecoration(
                   hintText: 'Altes Passwort eingeben',
@@ -48,12 +48,12 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
             ),
             TextField(
                 controller: _newPasswordFirstController,
-                maxLength: 60,
+                maxLength: constants.cMaxInputLength,
                 decoration: const InputDecoration(
                     hintText: 'Neues Passwort eingeben',
                     label: Text('Neues Passwort'))),
             TextField(
-              maxLength: 60,
+              maxLength: constants.cMaxInputLength,
               controller: _newPasswordSecondController,
               decoration: const InputDecoration(
                   hintText: 'Neues Passwort erneut eingeben',

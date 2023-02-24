@@ -39,6 +39,9 @@ dependencies:
   provider: ^6.0.5
   http: ^0.13.5
   tuple: ^2.0.1
+  syncfusion_flutter_charts: ^20.4.49
+  font_awesome_flutter: ^10.4.0
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
