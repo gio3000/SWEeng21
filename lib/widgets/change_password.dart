@@ -49,7 +49,7 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
                 SizedBox(
                     width: MediaQuery.of(context).size.width * 0.17,
                     child: TextField(
-                      maxLength: 60,
+                      maxLength: constants.cMaxInputLength,
                       obscureText: isOldObscurred,
                       controller: _oldPasswordController,
                       decoration: const InputDecoration(
@@ -71,7 +71,7 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
                     width: MediaQuery.of(context).size.width * 0.17,
                     child: TextField(
                         controller: _newPasswordFirstController,
-                        maxLength: 60,
+                        maxLength: constants.cMaxInputLength,
                         obscureText: isFirstNewObscurred,
                         decoration: const InputDecoration(
                             hintText: 'Neues Passwort eingeben',
@@ -91,7 +91,7 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
                     width: MediaQuery.of(context).size.width * 0.17,
                     child: TextField(
                         controller: _newPasswordSecondController,
-                        maxLength: 60,
+                        maxLength: constants.cMaxInputLength,
                         obscureText: isSecondNewObscurred,
                         decoration: const InputDecoration(
                             hintText: 'Neues Passwort erneut eingeben',

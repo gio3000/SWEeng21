@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 const Color screenBackgroundColor = Color.fromARGB(255, 211, 211, 211);
 
 //Validating form inputs
-const int cMaxInputLength = 40;
+const int cMaxInputLength = 60;
 
 //Spaces in design
 const double cPadding = 8.0;
+
+//BorderRadius in design
+const double cBorderRadius = 8.0;
