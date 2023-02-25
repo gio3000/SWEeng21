@@ -21,6 +21,10 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
   final TextEditingController _newPasswordSecondController =
       TextEditingController();
 
+  var isOldObscurred = true;
+  var isFirstNewObscurred = true;
+  var isSecondNewObscurred = true;
+
   ///calls saveNewPasswordMethod from admin_screen
   void saveNewPassword() {
     widget.saveNewPassword(_oldPasswordController.text,
@@ -32,32 +36,74 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
     return Dialog(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.2,
-        height: MediaQuery.of(context).size.height * 0.5,
+        height: MediaQuery.of(context).size.height * 0.35,
         padding: const EdgeInsets.all(constants.cPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('Passowrt ändern', style: TextStyle(fontSize: 25)),
-            TextField(
-              maxLength: 60,
-              controller: _oldPasswordController,
-              decoration: const InputDecoration(
-                  hintText: 'Altes Passwort eingeben',
-                  label: Text('Altes Password')),
+            const Spacer(),
+            Row(
+              children: [
+                SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.17,
+                    child: TextField(
+                      maxLength: 60,
+                      obscureText: isOldObscurred,
+                      controller: _oldPasswordController,
+                      decoration: const InputDecoration(
+                          hintText: 'Altes Passwort eingeben',
+                          label: Text('Altes Passwort')),
+                    )),
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isOldObscurred = !isOldObscurred;
+                      });
+                    },
+                    icon: const Icon(Icons.remove_red_eye))
+              ],
             ),
-            TextField(
-                controller: _newPasswordFirstController,
-                maxLength: 60,
-                decoration: const InputDecoration(
-                    hintText: 'Neues Passwort eingeben',
-                    label: Text('Neues Passwort'))),
-            TextField(
-              maxLength: 60,
-              controller: _newPasswordSecondController,
-              decoration: const InputDecoration(
-                  hintText: 'Neues Passwort erneut eingeben',
-                  label: Text('Neues Passwort')),
+            Row(
+              children: [
+                SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.17,
+                    child: TextField(
+                        controller: _newPasswordFirstController,
+                        maxLength: 60,
+                        obscureText: isFirstNewObscurred,
+                        decoration: const InputDecoration(
+                            hintText: 'Neues Passwort eingeben',
+                            label: Text('Neues Passwort')))),
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isFirstNewObscurred = !isFirstNewObscurred;
+                      });
+                    },
+                    icon: const Icon(Icons.remove_red_eye))
+              ],
+            ),
+            Row(
+              children: [
+                SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.17,
+                    child: TextField(
+                        controller: _newPasswordSecondController,
+                        maxLength: 60,
+                        obscureText: isSecondNewObscurred,
+                        decoration: const InputDecoration(
+                            hintText: 'Neues Passwort erneut eingeben',
+                            label: Text('Neues Passwort')))),
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isSecondNewObscurred = !isSecondNewObscurred;
+                      });
+                    },
+                    icon: const Icon(Icons.remove_red_eye))
+              ],
             ),
             const Spacer(),
             Row(
