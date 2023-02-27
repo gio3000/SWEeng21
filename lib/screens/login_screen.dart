@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/admin_screen.dart';
+import 'package:frontend/screens/secretary_home_screen.dart';
 import 'package:frontend/screens/student_screen.dart';
 import '../utils/constants.dart' as constants; //maxInputLength, cPadding
 
@@ -16,6 +18,7 @@ class LoginScreenState extends State<LoginScreen> {
   final _passwordFieldFocus = FocusNode();
   bool _isTryingToLogin = false; //false if in registration mode
   bool _isLoginSuccessful = false;
+  String loginRoute = StudentScreen.routeName;
 
   String username = '';
   String password = '';
@@ -112,6 +115,30 @@ class LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
+
+                      //TODO delete: just for testing purposes
+                      DropdownButton(
+                        value: loginRoute,
+                        items: const [
+                          DropdownMenuItem(
+                            value: StudentScreen.routeName,
+                            child: Text('Student'),
+                          ),
+                          DropdownMenuItem(
+                            value: SecretaryHomeScreen.routeName,
+                            child: Text('Sekretariat'),
+                          ),
+                          DropdownMenuItem(
+                            value: TechnicalAdministratorScreen.routeName,
+                            child: Text('Technischer Admin'),
+                          )
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            loginRoute = value!;
+                          });
+                        },
+                      )
                     ],
                   ),
                 ),
@@ -142,7 +169,7 @@ class LoginScreenState extends State<LoginScreen> {
     });
     if (!mounted) return;
     Navigator.of(context)
-        .pushReplacementNamed(StudentScreen.routeName, arguments: 'Test lool');
+        .pushReplacementNamed(loginRoute, arguments: 'Test lool');
   }
 
   ///validates the username text input field syntax

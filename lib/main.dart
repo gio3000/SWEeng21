@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/provider/authorization_provider.dart';
+import 'package:frontend/screens/secretary_home_screen.dart';
 import 'package:frontend/screens/student_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -31,6 +32,8 @@ class MyApp extends StatelessWidget {
           TechnicalAdministratorScreen.routeName: (context) =>
               const TechnicalAdministratorScreen(),
           StudentScreen.routeName: (context) => const StudentScreen(),
+          SecretaryHomeScreen.routeName: (context) =>
+              const SecretaryHomeScreen(),
         },
       ),
     );

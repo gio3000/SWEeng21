@@ -59,6 +59,7 @@ class _StudentScreenState extends State<StudentScreen> {
                 if (value == _changePasswordValue) {
                   showDialog(
                       context: context,
+                      barrierDismissible: false,
                       builder: (context) => ChangePassowrd(
                             saveNewPassword: () {},
                           ));

@@ -56,7 +56,7 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
 
                 ///TODO PasswortLänge festelgene
                 decoration: const InputDecoration(
-                    hintText: 'Passwort des Sekretariats eingeben',
+                    hintText: 'Initiales Passwort des Sekretariats eingeben',
                     label: Text('Passwort'))),
             const Spacer(),
             Row(

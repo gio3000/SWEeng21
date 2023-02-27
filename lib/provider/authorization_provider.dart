@@ -7,8 +7,7 @@ import 'package:http/http.dart' as http;
 
 class AuthorizationProvider with ChangeNotifier {
   String? _authorizationToken;
-
-  AuthorizationProvider();
+  final courses = ['TIT21', 'TIK21', 'TEM22', 'TEK19', 'TIS18'];
 
   ///tries to fetch the `authenticationToken` from the Webserver
   ///it sends `userName` and `password` to the Webserver. If these credentials
@@ -62,6 +61,16 @@ class AuthorizationProvider with ChangeNotifier {
         examDate: DateTime.now(),
       ),
     ];
+  }
+
+  Future<List<String>> getCourses() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return courses;
+  }
+
+  void addCourse(String title) {
+    courses.add(title);
+    notifyListeners();
   }
 
   void logout() {
