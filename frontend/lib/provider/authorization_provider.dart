@@ -41,9 +41,6 @@ class AuthorizationProvider with ChangeNotifier {
       await prefs.setString(
           constants.authTokenSharedPrefKey, authorizationToken ?? '');
 
-      await AuthHttp.delete(
-        'http://homenetwork-test.ddns.net:5160/api/user/15',
-      );
       notifyListeners();
     }
   }
