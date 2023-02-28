@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/provider/authorization_provider.dart';
-import 'package:frontend/widgets/course_list_tile.dart';
+import 'package:frontend/widgets/delete_list_tile.dart';
 import 'package:provider/provider.dart';
 
 // import '../../utils/constants.dart' as constants;
@@ -21,6 +21,7 @@ class _SecretaryCoursesScreenState extends State<SecretaryCoursesScreen> {
   void initState() {
     Provider.of<AuthorizationProvider>(context, listen: false)
         .getCourses()
+        .catchError((details) => <String>[])
         .then((value) => setState(() {
               _isLoading = false;
               courses = value;
@@ -30,6 +31,7 @@ class _SecretaryCoursesScreenState extends State<SecretaryCoursesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var _ = Provider.of<AuthorizationProvider>(context);
     return Scaffold(
       body: _isLoading
           ? const Center(
@@ -38,7 +40,12 @@ class _SecretaryCoursesScreenState extends State<SecretaryCoursesScreen> {
           : Consumer(
               builder: (context, AuthorizationProvider value, child) =>
                   ListView(
-                children: courses.map((e) => CourseListTile(title: e)).toList(),
+                children: courses
+                    .map((e) => DeleteListTile(
+                          title: e,
+                          onDelete: onDeleteCourse,
+                        ))
+                    .toList(),
               ),
             ),
       floatingActionButton: FloatingActionButton(
@@ -47,6 +54,34 @@ class _SecretaryCoursesScreenState extends State<SecretaryCoursesScreen> {
       ),
     );
   }
+}
+
+void onDeleteCourse(BuildContext context, String title) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Kurs $title löschen'),
+      content: Text(
+        '''
+Bist du dir sicher, dass du den Kurs $title 
+unwiderruflich löschen möchtest?
+        ''',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Abbrechen'),
+        ),
+        TextButton(
+            onPressed: () {
+              Provider.of<AuthorizationProvider>(context, listen: false)
+                  .deleteCourse(title);
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'))
+      ],
+    ),
+  );
 }
 
 ///draws a dialog on the screen where new courses can be added
@@ -62,7 +97,6 @@ void _showAddCourseDialog(BuildContext context) {
             maxLength: 7,
             validator: validateAddCourseInput,
             onSaved: (text) {
-              //TODO
               Provider.of<AuthorizationProvider>(context, listen: false)
                   .addCourse(text!);
             },

@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 class AuthorizationProvider with ChangeNotifier {
   String? _authorizationToken;
   final courses = ['TIT21', 'TIK21', 'TEM22', 'TEK19', 'TIS18'];
+  final lecturers = ['Sommer', 'Maus', 'Kegreiß', 'Schneider', 'Vollkorn Bio'];
 
   ///tries to fetch the `authenticationToken` from the Webserver
   ///it sends `userName` and `password` to the Webserver. If these credentials
@@ -70,6 +71,26 @@ class AuthorizationProvider with ChangeNotifier {
 
   void addCourse(String title) {
     courses.add(title);
+    notifyListeners();
+  }
+
+  void deleteCourse(String title) {
+    courses.removeWhere((element) => title == element);
+    notifyListeners();
+  }
+
+  Future<List<String>> getLecturer() async {
+    await Future.delayed(const Duration(seconds: 1));
+    return lecturers;
+  }
+
+  void addLecturer(String name) {
+    lecturers.add(name);
+    notifyListeners();
+  }
+
+  void deleteLecturer(String name) {
+    lecturers.removeWhere((element) => element == name);
     notifyListeners();
   }
 

@@ -1,17 +1,116 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:frontend/provider/authorization_provider.dart';
+import 'package:frontend/widgets/delete_list_tile.dart';
+import 'package:provider/provider.dart';
 
-class SecretaryLecturerScreen extends StatelessWidget {
+import '../../utils/constants.dart' as constants;
+
+class SecretaryLecturerScreen extends StatefulWidget {
   const SecretaryLecturerScreen({super.key});
 
   @override
+  State<SecretaryLecturerScreen> createState() =>
+      _SecretaryLecturerScreenState();
+}
+
+class _SecretaryLecturerScreenState extends State<SecretaryLecturerScreen> {
+  List<String> lecturers = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<AuthorizationProvider>(context, listen: false)
+        .getLecturer()
+        .then((value) {
+      setState(() {
+        _isLoading = false;
+        lecturers = value;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    var _ = Provider.of<AuthorizationProvider>(context);
     return Scaffold(
-      body: const Center(child: Text('Dozenten')),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => showAddLecturerDialog(context),
         child: const FaIcon(FontAwesomeIcons.plus),
       ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              children: lecturers
+                  .map((name) =>
+                      DeleteListTile(title: name, onDelete: onDeleteLecturer))
+                  .toList(),
+            ),
     );
+  }
+
+  void onDeleteLecturer(BuildContext context, String name) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text('Dozent $name löschen'),
+              content: Text(
+                  'Möchten Sie wirklich den Dozenten $name\nunwiderruflich löschen?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Abbrechen'),
+                ),
+                TextButton(
+                    onPressed: () {
+                      Provider.of<AuthorizationProvider>(context, listen: false)
+                          .deleteLecturer(name);
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('OK'))
+              ],
+            ));
+  }
+
+  void showAddLecturerDialog(BuildContext context) {
+    var formKey = GlobalKey<FormState>();
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              content: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextFormField(
+                      maxLength: constants.cMaxInputLength,
+                      validator: (value) {
+                        if ((value?.length ?? 0) < 3) {
+                          return 'Zu wenige Buchstaben eingegeben';
+                        }
+                        return null;
+                      },
+                      onSaved: (newValue) {
+                        Provider.of<AuthorizationProvider>(context,
+                                listen: false)
+                            .addLecturer(newValue!);
+                      },
+                      decoration: const InputDecoration(
+                          hintText: 'Max Müller', label: Text('Dozentenname')),
+                    ),
+                    ElevatedButton(
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            formKey.currentState!.save();
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: const Text('Hinzufügen')),
+                  ],
+                ),
+              ),
+            ));
   }
 }
