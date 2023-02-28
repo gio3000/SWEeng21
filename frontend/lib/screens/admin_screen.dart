@@ -22,9 +22,6 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   ///Map to save index of widget and secretariats password
   Map<int, String> passwords = {};
 
-  ///String to save the new Password
-  late String newPassword;
-
   ///List with secretariats which passwords have been reseted
   List<int> secretaryWithResetedPassword = [];
 
@@ -57,22 +54,13 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     return secretariatsNames[index];
   }
 
-  ///sets new Password so it can be transfered to Database
-  void setNewPassword(String oldPwd, String newPwdOne, String newPwdTwo) {
-    ///TODO check if old pwd is correct
-    if (newPwdOne == newPwdTwo && newPwdOne != oldPwd) {
-      newPassword = newPwdOne;
-      debugPrint(newPwdOne);
-    }
-  }
-
   ///calls Dialog to change Password
   void callChangePasswordDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return ChangePassowrd(saveNewPassword: setNewPassword);
+        return const ChangePassowrd();
       },
     );
   }

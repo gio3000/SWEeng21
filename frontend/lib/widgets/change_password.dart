@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/provider/authorization_provider.dart';
+import 'package:provider/provider.dart';
 import '../utils/constants.dart' as constants;
 
 class ChangePassowrd extends StatefulWidget {
-  final Function saveNewPassword;
-  const ChangePassowrd({super.key, required this.saveNewPassword});
-
+  const ChangePassowrd({super.key});
   @override
   State<ChangePassowrd> createState() => _ChangePassowrdState();
 }
@@ -27,8 +27,10 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
 
   ///calls saveNewPasswordMethod from admin_screen
   void saveNewPassword() {
-    widget.saveNewPassword(_oldPasswordController.text,
-        _newPasswordFirstController.text, _newPasswordSecondController.text);
+    Provider.of<AuthorizationProvider>(context, listen: false).setNewPassword(
+        _oldPasswordController.text,
+        _newPasswordFirstController.text,
+        _newPasswordSecondController.text);
   }
 
   @override

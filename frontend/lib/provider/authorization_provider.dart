@@ -9,6 +9,7 @@ class AuthorizationProvider with ChangeNotifier {
   String? _authorizationToken;
   final courses = ['TIT21', 'TIK21', 'TEM22', 'TEK19', 'TIS18'];
   final lecturers = ['Sommer', 'Maus', 'Kegreiß', 'Schneider', 'Vollkorn Bio'];
+  late String newPassword;
 
   ///tries to fetch the `authenticationToken` from the Webserver
   ///it sends `userName` and `password` to the Webserver. If these credentials
@@ -96,5 +97,13 @@ class AuthorizationProvider with ChangeNotifier {
 
   void logout() {
     //TODO
+  }
+
+  void setNewPassword(String oldPwd, String newPwdOne, String newPwdTwo) {
+    ///TODO check if old pwd is correct
+    if (newPwdOne == newPwdTwo && newPwdOne != oldPwd) {
+      newPassword = newPwdOne;
+      debugPrint(newPwdOne);
+    }
   }
 }
