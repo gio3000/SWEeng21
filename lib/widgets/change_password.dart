@@ -36,7 +36,7 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
     return Dialog(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.2,
-        height: MediaQuery.of(context).size.height * 0.35,
+        height: MediaQuery.of(context).size.height * 0.6,
         padding: const EdgeInsets.all(constants.cPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
