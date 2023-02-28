@@ -60,7 +60,9 @@ class _StudentScreenState extends State<StudentScreen> {
                   showDialog(
                       context: context,
                       barrierDismissible: false,
-                      builder: (context) => const ChangePassowrd());
+                      builder: (context) => ChangePassowrd(
+                            saveNewPassword: () {},
+                          ));
                 }
               },
               itemBuilder: (context) => [

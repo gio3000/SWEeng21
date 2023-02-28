@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 ///in here all global used Constants are stored
 
+//Shared Preferences
+const String authTokenSharedPrefKey = '/authorization-token';
+
 //Colors
 const Color screenBackgroundColor = Color.fromARGB(255, 211, 211, 211);
 

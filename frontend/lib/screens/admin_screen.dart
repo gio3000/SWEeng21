@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../widgets/delete_secretariat_dialog.dart';
 import '../utils/constants.dart' as constants;
 import '../widgets/admin_list_tile.dart';
 import '../widgets/add_secretariat_dialog.dart';
 import '../widgets/change_password.dart';
-import '../provider/authorization_provider.dart';
-import 'package:frontend/screens/login_screen.dart';
-
-//TODO Backend connection
 
 class TechnicalAdministratorScreen extends StatefulWidget {
   static const routeName = '/technical-admin';
@@ -20,14 +15,14 @@ class TechnicalAdministratorScreen extends StatefulWidget {
 }
 
 class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
-  static const _logoutValue = 'logout';
-  static const _changePasswordValue = 'changePassword';
-
   ///Map to save index of widget and secretariats name
   Map<int, String> newNames = {};
 
   ///Map to save index of widget and secretariats password
   Map<int, String> passwords = {};
+
+  ///String to save the new Password
+  late String newPassword;
 
   ///List with secretariats which passwords have been reseted
   List<int> secretaryWithResetedPassword = [];
@@ -61,13 +56,22 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     return secretariatsNames[index];
   }
 
+  ///sets new Password so it can be transfered to Database
+  void setNewPassword(
+      String oldPwd, String newPwdOne, String newPwdTwo, int index) {
+    ///TODO check if old pwd is correct
+    if (newPwdOne == newPwdTwo) {
+      newPassword = newPwdOne;
+    }
+  }
+
   ///calls Dialog to change Password
   void callChangePasswordDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return const ChangePassowrd();
+        return ChangePassowrd(saveNewPassword: setNewPassword);
       },
     );
   }
@@ -124,38 +128,15 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     return Scaffold(
         backgroundColor: constants.screenBackgroundColor,
         appBar: AppBar(
-          title: const Text('Dashboard - Student'),
+          title: Text(
+              ModalRoute.of(context)?.settings.arguments as String? ?? 'Admin'),
           actions: [
-            PopupMenuButton(
-              onSelected: (value) {
-                if (value == _logoutValue) {
-                  Provider.of<AuthorizationProvider>(context, listen: false)
-                      .logout();
-                  Navigator.of(context)
-                      .pushReplacementNamed(LoginScreen.routeName);
-                  return;
-                }
-                if (value == _changePasswordValue) {
-                  showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) => const ChangePassowrd());
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: _changePasswordValue,
-                  child: const Text('Passwort ändern'),
-                  onTap: () {
-                    //TODO
-                  },
-                ),
-                const PopupMenuItem(
-                  value: _logoutValue,
-                  child: Text('Abmelden'),
-                ),
-              ],
-            )
+            IconButton(
+                onPressed: () {
+                  callChangePasswordDialog();
+                },
+                tooltip: 'Passwort ändern',
+                icon: const Icon(Icons.more_vert))
           ],
         ),
         body: Padding(
@@ -194,6 +175,8 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             callAddDialog((secretariatsNames.length + 1));
+            // addSecretariat(
+            //     'Sekretariat ${(int.tryParse(secretariatsNames.last.split(' ')[1]) ?? secretariatsNames.length) + 1}');
           },
           tooltip: 'Sekretariat hinzufügen',
           child: const Icon(Icons.add),

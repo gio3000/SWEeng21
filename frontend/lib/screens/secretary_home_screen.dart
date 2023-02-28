@@ -67,7 +67,10 @@ class _SecretaryHomeScreenState extends State<SecretaryHomeScreen> {
                   case _passwordChangeValue:
                     showDialog(
                         context: context,
-                        builder: (context) => const ChangePassowrd());
+                        builder: (context) =>
+                            ChangePassowrd(saveNewPassword: () {
+                              //TODO
+                            }));
                     break;
                 }
               },

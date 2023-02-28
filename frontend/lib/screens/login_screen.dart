@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/provider/authorization_provider.dart';
 import 'package:frontend/screens/admin_screen.dart';
 import 'package:frontend/screens/secretary_home_screen.dart';
 import 'package:frontend/screens/student_screen.dart';
+import 'package:provider/provider.dart';
 import '../utils/constants.dart' as constants; //maxInputLength, cPadding
 
 class LoginScreen extends StatefulWidget {
@@ -16,11 +18,12 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _passwordFieldFocus = FocusNode();
-  bool _isTryingToLogin = false; //false if in registration mode
+  bool _isTryingToLogin = false; //true if loading
   bool _isLoginSuccessful = false;
+  int tryLoginCount = 0;
   String loginRoute = StudentScreen.routeName;
 
-  String username = '';
+  String email = '';
   String password = '';
 
   @override
@@ -55,10 +58,15 @@ class LoginScreenState extends State<LoginScreen> {
                         maxLength: constants.cMaxInputLength,
                         textInputAction: TextInputAction.next,
                         decoration: const InputDecoration(
-                          label: Text('Benutzername'),
+                          label: Text('E-Mail'),
                           hintText: 'max-it21@it.dhbw-ravensburg.de',
                         ),
                         validator: validateUsernameInput,
+                        onSaved: (newValue) {
+                          setState(() {
+                            email = newValue ?? '';
+                          });
+                        },
                         //if finished typing, change focus to password input field
                         onFieldSubmitted: (_) => FocusScope.of(context)
                             .requestFocus(_passwordFieldFocus),
@@ -75,9 +83,23 @@ class LoginScreenState extends State<LoginScreen> {
                           label: Text('Passwort'),
                           hintText: 'Passwort hier eingeben',
                         ),
+                        onSaved: (newValue) {
+                          setState(() {
+                            password = newValue ?? '';
+                          });
+                        },
                         validator: validatePasswordInput,
                         onFieldSubmitted: (_) => _submitData(),
                       ),
+                      _isLoginSuccessful == false && tryLoginCount > 0
+                          ? Text(
+                              'Benutzername oder Passwort sind falsch! Versuche es nocheinmal',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.error,
+                                fontSize: 16,
+                              ),
+                            )
+                          : const SizedBox(),
                       const SizedBox(
                         height: 50,
                       ),
@@ -95,27 +117,6 @@ class LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
-                      const SizedBox(height: constants.cPadding),
-
-                      //Registration button
-                      _isTryingToLogin
-                          ? const SizedBox()
-                          : SizedBox(
-                              width: double.infinity,
-                              child: TextButton(
-                                onPressed: () {
-                                  //TODO manage login
-                                },
-                                child: const Text(
-                                  'Du hast noch keinen Account?',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.black45,
-                                  ),
-                                ),
-                              ),
-                            ),
-
                       //TODO delete: just for testing purposes
                       DropdownButton(
                         value: loginRoute,
@@ -160,16 +161,27 @@ class LoginScreenState extends State<LoginScreen> {
     _formKey.currentState!.save();
     setState(() => _isTryingToLogin = true);
 
-    //TODO async await login
-    await Future.delayed(const Duration(seconds: 1));
-
-    setState(() {
+    await Provider.of<AuthorizationProvider>(context, listen: false)
+        .authorize(email, password)
+        .then(
+          (_) => setState(
+            () {
+              _isTryingToLogin = false;
+              _isLoginSuccessful = true;
+            },
+          ),
+        )
+        .catchError((details) {
+      debugPrint(details.toString());
       _isTryingToLogin = false;
-      //TODO check whether login was successful
+    });
+    setState(() {
+      tryLoginCount++;
     });
     if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed(loginRoute,
-        arguments: 'Technischer Administrator');
+    if (_isLoginSuccessful == false) return;
+    Navigator.of(context)
+        .pushReplacementNamed(loginRoute, arguments: 'Test lool');
   }
 
   ///validates the username text input field syntax
@@ -194,7 +206,7 @@ class LoginScreenState extends State<LoginScreen> {
     if (inputValue.length > constants.cMaxInputLength) {
       return 'Zu viele Zeichen!';
     }
-    if (inputValue.length < 8) {
+    if (inputValue.length < 4) {
       return 'Zu wenige Zeichen!';
     }
     //TODO check for capital letters, numbers and special characters

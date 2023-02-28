@@ -3,33 +3,56 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:frontend/errors/authorization_exception.dart';
 import 'package:frontend/models/grade.dart';
+import 'package:frontend/utils/authenticated_request.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../utils/constants.dart' as constants;
 
 class AuthorizationProvider with ChangeNotifier {
-  String? _authorizationToken;
-  final courses = ['TIT21', 'TIK21', 'TEM22', 'TEK19', 'TIS18'];
-  final lecturers = ['Sommer', 'Maus', 'Kegreiß', 'Schneider', 'Vollkorn Bio'];
-  late String newPwd;
+  String? authorizationToken;
+  final _courses = ['TIT21', 'TIK21', 'TEM22', 'TEK19', 'TIS18'];
+  final _lecturers = ['Sommer', 'Maus', 'Kegreiß', 'Schneider', 'Vollkorn Bio'];
 
   ///tries to fetch the `authenticationToken` from the Webserver
   ///it sends `userName` and `password` to the Webserver. If these credentials
   ///are approved the server should send a token back otherwise null is stored in
   ///`authenticationToken`
-  Future<void> tryToGetTokenWith(String userName, String password) async {
-    final response = await http.get(Uri.parse('TODO')); //TODO add correct url
+  Future<void> authorize(String email, String password) async {
+    Map<String, String> authorizationData = {
+      "email": email,
+      "password": password,
+    };
+    final response = await http.post(
+        Uri.parse(
+          'http://homenetwork-test.ddns.net:5160/api/token',
+        ),
+        body: json.encode(authorizationData),
+        headers: {
+          "Content-Type": "application/json",
+        });
+    debugPrint(response.statusCode.toString());
+    debugPrint(response.body);
     if (response.statusCode >= 400) {
       throw AuthorizationException();
     } else {
-      final parsedResponse = json.decode(response.body);
-      _authorizationToken = parsedResponse['token'];
+      authorizationToken = response.body;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          constants.authTokenSharedPrefKey, authorizationToken ?? '');
+
+      await AuthHttp.delete(
+        'http://homenetwork-test.ddns.net:5160/api/user/15',
+      );
+      notifyListeners();
     }
   }
 
   //TODO maybe move this to another file
   Future<Map<String, dynamic>> authorizedRequest(Uri url) async {
-    if (_authorizationToken == null) throw AuthorizationException();
+    if (authorizationToken == null) throw AuthorizationException();
     final response = await http
-        .post(url, headers: {'Authorization': 'Bearer $_authorizationToken'});
+        .post(url, headers: {'Authorization': 'Bearer $authorizationToken'});
     return json.decode(response.body);
   }
 
@@ -67,43 +90,35 @@ class AuthorizationProvider with ChangeNotifier {
 
   Future<List<String>> getCourses() async {
     await Future.delayed(const Duration(seconds: 1));
-    return courses;
+    return _courses;
   }
 
   void addCourse(String title) {
-    courses.add(title);
+    _courses.add(title);
     notifyListeners();
   }
 
   void deleteCourse(String title) {
-    courses.removeWhere((element) => title == element);
+    _courses.removeWhere((element) => title == element);
     notifyListeners();
   }
 
   Future<List<String>> getLecturer() async {
     await Future.delayed(const Duration(seconds: 1));
-    return lecturers;
+    return _lecturers;
   }
 
   void addLecturer(String name) {
-    lecturers.add(name);
+    _lecturers.add(name);
     notifyListeners();
   }
 
   void deleteLecturer(String name) {
-    lecturers.removeWhere((element) => element == name);
+    _lecturers.removeWhere((element) => element == name);
     notifyListeners();
   }
 
   void logout() {
-    //TODO
-  }
-
-  void setNewPassword(String oldPwd, String newPwdOne, String newPwdTwo) {
-    ///TODO check if old pwd is correct
-    if (newPwdOne == newPwdTwo && newPwdOne != oldPwd) {
-      newPwd = newPwdOne;
-      debugPrint(newPwdOne);
-    }
+    authorizationToken = null;
   }
 }

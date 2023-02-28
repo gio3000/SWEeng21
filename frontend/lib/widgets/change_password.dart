@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/provider/authorization_provider.dart';
-import 'package:provider/provider.dart';
 import '../utils/constants.dart' as constants;
 
 class ChangePassowrd extends StatefulWidget {
-  const ChangePassowrd({super.key});
+  final Function saveNewPassword;
+  const ChangePassowrd({super.key, required this.saveNewPassword});
+
   @override
   State<ChangePassowrd> createState() => _ChangePassowrdState();
 }
@@ -25,12 +25,10 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
   var isFirstNewObscurred = true;
   var isSecondNewObscurred = true;
 
-  ///calls saveNewPasswordMethod from AuthorizationProvider
+  ///calls saveNewPasswordMethod from admin_screen
   void saveNewPassword() {
-    Provider.of<AuthorizationProvider>(context, listen: false).setNewPassword(
-        _oldPasswordController.text,
-        _newPasswordFirstController.text,
-        _newPasswordSecondController.text);
+    widget.saveNewPassword(_oldPasswordController.text,
+        _newPasswordFirstController.text, _newPasswordSecondController.text);
   }
 
   @override
@@ -38,7 +36,7 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
     return Dialog(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.2,
-        height: MediaQuery.of(context).size.height * 0.6,
+        height: MediaQuery.of(context).size.height * 0.35,
         padding: const EdgeInsets.all(constants.cPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
