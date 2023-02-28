@@ -168,8 +168,8 @@ class LoginScreenState extends State<LoginScreen> {
       //TODO check whether login was successful
     });
     if (!mounted) return;
-    Navigator.of(context)
-        .pushReplacementNamed(loginRoute, arguments: 'Test lool');
+    Navigator.of(context).pushReplacementNamed(loginRoute,
+        arguments: 'Technischer Administrator');
   }
 
   ///validates the username text input field syntax

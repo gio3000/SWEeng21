@@ -117,8 +117,8 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     return Scaffold(
         backgroundColor: constants.screenBackgroundColor,
         appBar: AppBar(
-          title: Text(
-              ModalRoute.of(context)?.settings.arguments as String? ?? 'Admin'),
+          title: Text(ModalRoute.of(context)?.settings.arguments as String? ??
+              'Dashboard - Admin'),
           actions: [
             IconButton(
                 onPressed: () {

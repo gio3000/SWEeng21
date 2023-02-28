@@ -25,7 +25,7 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
   var isFirstNewObscurred = true;
   var isSecondNewObscurred = true;
 
-  ///calls saveNewPasswordMethod from admin_screen
+  ///calls saveNewPasswordMethod from AuthorizationProvider
   void saveNewPassword() {
     Provider.of<AuthorizationProvider>(context, listen: false).setNewPassword(
         _oldPasswordController.text,
