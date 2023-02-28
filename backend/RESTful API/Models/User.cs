@@ -1,4 +1,6 @@
-﻿namespace RESTful_API.Models
+﻿using System.Text.Json.Serialization;
+
+namespace RESTful_API.Models
 {
     public class User
     {
@@ -10,6 +12,7 @@
         public string? Salt { get; set; }
         public int Hash_Count { get; set; }
 
-        public List<Admin>? Admins { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<Admin>? Admins { get; set; }
     }
 }

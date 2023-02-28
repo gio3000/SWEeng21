@@ -53,6 +53,8 @@ namespace RESTful_API.Controllers
                         expires: DateTime.UtcNow.AddMinutes(10),
                         signingCredentials: signIn);
 
+                    
+
                     return Ok(new JwtSecurityTokenHandler().WriteToken(token));
                 }
                 else

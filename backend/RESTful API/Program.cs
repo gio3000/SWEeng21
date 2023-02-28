@@ -42,9 +42,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "MyPolicy",
                 policy =>
                 {
-                    policy.WithOrigins("http://homenetwork-test.ddns.net.5160")
+                    policy.WithOrigins("*")
                             .WithHeaders("*")
-                            .WithMethods("*");
+                            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
                 });
 });
 

@@ -47,8 +47,8 @@ namespace RESTful_API.Models
                 entity.Property(e => e.UserID).IsUnicode(false);
             });
             modelBuilder.Entity<Admin>()
-                .HasOne(u => u.User)
-                .WithMany(a => a.Admins)
+                .HasOne<User>(a => a.User)
+                .WithMany(u => u.Admins)
                 .HasForeignKey(a => a.UserID);
 
             // Course table
