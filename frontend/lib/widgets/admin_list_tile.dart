@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../utils/constants.dart' as constants;
 
 class AdminListTile extends StatefulWidget {
   final int index;
@@ -66,7 +65,9 @@ class _AdminListTileState extends State<AdminListTile> {
               children: [
                 Expanded(
                     child: TextField(
-                  maxLength: constants.cMaxInputLength,
+                  maxLength: 60,
+
+                  ///TODO Namenslänge definieren
                   controller: _nameController,
                   decoration: InputDecoration(
                     hintText: secretaryName,

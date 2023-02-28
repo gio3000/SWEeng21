@@ -42,7 +42,9 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
             const Text('Sekretariat hinzufügen',
                 style: TextStyle(fontSize: 25)),
             TextField(
-              maxLength: constants.cMaxInputLength,
+              maxLength: 60,
+
+              ///TODO Namenslänge festlegen
               controller: _nameController,
               decoration: const InputDecoration(
                   hintText: 'Name des Sekretariats eingeben',
@@ -50,7 +52,9 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
             ),
             TextField(
                 controller: _passwordController,
-                maxLength: constants.cMaxInputLength,
+                maxLength: 60,
+
+                ///TODO PasswortLänge festelgene
                 decoration: const InputDecoration(
                     hintText: 'Initiales Passwort des Sekretariats eingeben',
                     label: Text('Passwort'))),
