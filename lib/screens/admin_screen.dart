@@ -4,6 +4,7 @@ import '../utils/constants.dart' as constants;
 import '../widgets/admin_list_tile.dart';
 import '../widgets/add_secretariat_dialog.dart';
 import '../widgets/change_password.dart';
+//TODO Backend connection
 
 class TechnicalAdministratorScreen extends StatefulWidget {
   static const routeName = '/technical-admin';
@@ -57,11 +58,11 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   }
 
   ///sets new Password so it can be transfered to Database
-  void setNewPassword(
-      String oldPwd, String newPwdOne, String newPwdTwo, int index) {
+  void setNewPassword(String oldPwd, String newPwdOne, String newPwdTwo) {
     ///TODO check if old pwd is correct
-    if (newPwdOne == newPwdTwo) {
+    if (newPwdOne == newPwdTwo && newPwdOne != oldPwd) {
       newPassword = newPwdOne;
+      debugPrint(newPwdOne);
     }
   }
 
@@ -175,8 +176,6 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             callAddDialog((secretariatsNames.length + 1));
-            // addSecretariat(
-            //     'Sekretariat ${(int.tryParse(secretariatsNames.last.split(' ')[1]) ?? secretariatsNames.length) + 1}');
           },
           tooltip: 'Sekretariat hinzufügen',
           child: const Icon(Icons.add),
