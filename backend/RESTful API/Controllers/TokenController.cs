@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +10,7 @@ using System.Text;
 
 namespace RESTful_API.Controllers
 {
+    [EnableCors("MyPolicy")]
     [Route("api/token")]
     [ApiController]
     public class TokenController : ControllerBase

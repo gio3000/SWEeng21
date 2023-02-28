@@ -42,13 +42,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: "MyPolicy",
                 policy =>
                 {
-                    policy.WithOrigins("http://example.com",
-                        "http://www.contoso.com",
-                        "https://cors1.azurewebsites.net",
-                        "https://cors3.azurewebsites.net",
-                        "https://localhost:44398",
-                        "https://localhost:5001")
-                            .WithMethods("PUT", "DELETE", "GET");
+                    policy.WithOrigins("http://homenetwork-test.ddns.net.5160")
+                            .WithMethods("PUT", "DELETE", "GET", "POST");
                 });
 });
 

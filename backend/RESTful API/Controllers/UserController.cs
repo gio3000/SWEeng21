@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using RESTful_API.Models;
 
 namespace RESTful_API.Controllers
 {
+    [EnableCors("MyPolicy")]
     [Authorize]
     [Route("api/user")]
     [ApiController]
