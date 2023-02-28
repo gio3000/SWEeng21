@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../widgets/delete_secretariat_dialog.dart';
 import '../utils/constants.dart' as constants;
 import '../widgets/admin_list_tile.dart';
 import '../widgets/add_secretariat_dialog.dart';
 import '../widgets/change_password.dart';
+import '../provider/authorization_provider.dart';
+import 'package:frontend/screens/login_screen.dart';
+
 //TODO Backend connection
 
 class TechnicalAdministratorScreen extends StatefulWidget {
@@ -16,6 +20,9 @@ class TechnicalAdministratorScreen extends StatefulWidget {
 }
 
 class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
+  static const _logoutValue = 'logout';
+  static const _changePasswordValue = 'changePassword';
+
   ///Map to save index of widget and secretariats name
   Map<int, String> newNames = {};
 
@@ -117,15 +124,38 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     return Scaffold(
         backgroundColor: constants.screenBackgroundColor,
         appBar: AppBar(
-          title: Text(ModalRoute.of(context)?.settings.arguments as String? ??
-              'Dashboard - Admin'),
+          title: const Text('Dashboard - Student'),
           actions: [
-            IconButton(
-                onPressed: () {
-                  callChangePasswordDialog();
-                },
-                tooltip: 'Passwort ändern',
-                icon: const Icon(Icons.more_vert))
+            PopupMenuButton(
+              onSelected: (value) {
+                if (value == _logoutValue) {
+                  Provider.of<AuthorizationProvider>(context, listen: false)
+                      .logout();
+                  Navigator.of(context)
+                      .pushReplacementNamed(LoginScreen.routeName);
+                  return;
+                }
+                if (value == _changePasswordValue) {
+                  showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => const ChangePassowrd());
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: _changePasswordValue,
+                  child: const Text('Passwort ändern'),
+                  onTap: () {
+                    //TODO
+                  },
+                ),
+                const PopupMenuItem(
+                  value: _logoutValue,
+                  child: Text('Abmelden'),
+                ),
+              ],
+            )
           ],
         ),
         body: Padding(
