@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/models/grade.dart';
 import 'package:frontend/provider/authorization_provider.dart';
+import 'package:frontend/provider/user_data_provider.dart';
 import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/widgets/change_password.dart';
 import 'package:frontend/widgets/grade_subject_list_tile.dart';
@@ -29,7 +30,8 @@ class _StudentScreenState extends State<StudentScreen> {
 
   @override
   void initState() {
-    Provider.of<AuthorizationProvider>(context, listen: false)
+    context
+        .read<UserDataProvider>()
         .getGradesFrom("") //TODO
         .then((value) {
       setState(() {
