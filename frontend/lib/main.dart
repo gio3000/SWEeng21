@@ -6,9 +6,13 @@ import 'package:provider/provider.dart';
 
 import '../screens/login_screen.dart';
 import 'screens/admin_screen.dart';
+import 'provider/user_data_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => UserDataProvider()),
+    ChangeNotifierProvider(create: (_) => AuthorizationProvider())
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -17,25 +21,21 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<AuthorizationProvider>.value(
-      value: AuthorizationProvider(),
-      builder: (context, child) => MaterialApp(
-        title: 'DHBW Studierendenverwaltungssystem',
-        theme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-        ),
-        // home: const LoginScreen(),
-        // home: const TechnicalAdministratorScreen(title: 'Startseite'),
-        initialRoute: LoginScreen.routeName,
-        routes: {
-          LoginScreen.routeName: (context) => const LoginScreen(),
-          TechnicalAdministratorScreen.routeName: (context) =>
-              const TechnicalAdministratorScreen(),
-          StudentScreen.routeName: (context) => const StudentScreen(),
-          SecretaryHomeScreen.routeName: (context) =>
-              const SecretaryHomeScreen(),
-        },
+    return MaterialApp(
+      title: 'DHBW Studierendenverwaltungssystem',
+      theme: ThemeData(
+        primarySwatch: Colors.deepOrange,
       ),
+      // home: const LoginScreen(),
+      // home: const TechnicalAdministratorScreen(title: 'Startseite'),
+      initialRoute: LoginScreen.routeName,
+      routes: {
+        LoginScreen.routeName: (context) => const LoginScreen(),
+        TechnicalAdministratorScreen.routeName: (context) =>
+            const TechnicalAdministratorScreen(),
+        StudentScreen.routeName: (context) => const StudentScreen(),
+        SecretaryHomeScreen.routeName: (context) => const SecretaryHomeScreen(),
+      },
     );
   }
 }

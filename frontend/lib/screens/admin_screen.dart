@@ -71,7 +71,7 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return ChangePassowrd(saveNewPassword: setNewPassword);
+        return const ChangePassowrd();
       },
     );
   }
