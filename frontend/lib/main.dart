@@ -13,6 +13,7 @@ void main() {
     ChangeNotifierProvider(create: (_) => UserDataProvider()),
     ChangeNotifierProvider(create: (_) => AuthorizationProvider())
   ], child: const MyApp()));
+
 }
 
 class MyApp extends StatelessWidget {
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         StudentScreen.routeName: (context) => const StudentScreen(),
         SecretaryHomeScreen.routeName: (context) => const SecretaryHomeScreen(),
       },
+
     );
   }
 }

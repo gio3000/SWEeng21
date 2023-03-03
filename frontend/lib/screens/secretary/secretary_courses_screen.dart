@@ -99,6 +99,7 @@ void _showAddCourseDialog(BuildContext context) {
             validator: validateAddCourseInput,
             onSaved: (text) {
               context.read<UserDataProvider>().addCourse(text!);
+
             },
             decoration: const InputDecoration(
                 hintText: 'TIT23', label: Text('Kurskürzel')),
