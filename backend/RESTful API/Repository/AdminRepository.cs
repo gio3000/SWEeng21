@@ -18,7 +18,7 @@ namespace RESTful_API.Repository
             try
             {
                 return _dbContext.Admins
-                    .Include(u => u.UserID)
+                    .Include(a => a.User)
                     .ToList();
             }
             catch
@@ -31,7 +31,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-                Admin? admin = _dbContext.Admins.Include(a => a.UserID).Single(a => a.AdminID == id);
+                Admin? admin = _dbContext.Admins.Include(a => a.User).Single(a => a.AdminID == id);
                 if (admin != null)
                 {
                     return admin;

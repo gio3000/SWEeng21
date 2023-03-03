@@ -60,15 +60,18 @@ namespace RESTful_API.Models
             });
 
             // CourseModuleRel table
-            modelBuilder.Entity<CourseModuleRel>(entity =>
-            {
-                entity.ToTable("CourseModuleRel");
-                entity.HasNoKey();
-                entity.Property(e => e.CourseID).HasColumnName("CourseID");
-                entity.Property(e => e.ModuleID).HasColumnName("ModuleID");
-            });
-            modelBuilder.Entity<CourseModuleRel>().HasOne<Course>().WithMany().HasForeignKey(e => e.CourseID);
-            modelBuilder.Entity<CourseModuleRel>().HasOne<Module>().WithMany().HasForeignKey(e => e.ModuleID);
+            modelBuilder.Entity<CourseModuleRel>().HasKey(cm => new { cm.CourseID, cm.ModuleID });
+
+            modelBuilder.Entity<CourseModuleRel>()
+                .HasOne<Course>(cm => cm.Course)
+                .WithMany(c => c.CourseModuleRels)
+                .HasForeignKey(cm => cm.CourseID);
+
+
+            modelBuilder.Entity<CourseModuleRel>()
+                .HasOne<Module>(cm => cm.Module)
+                .WithMany(m => m.CourseModuleRels)
+                .HasForeignKey(cm => cm.ModuleID);
 
             // Exam table
             modelBuilder.Entity<Exam>(entity =>
@@ -81,8 +84,15 @@ namespace RESTful_API.Models
                 entity.Property(e => e.Semester).HasMaxLength(20).IsUnicode(true);
                 entity.Property(e => e.CountToAverage).IsUnicode(false);
             });
-            modelBuilder.Entity<Exam>().HasOne<Lecture>().WithMany().HasForeignKey(e => e.LectureID);
-            modelBuilder.Entity<Exam>().HasOne<Student>().WithMany().HasForeignKey(e => e.StudentID);
+            modelBuilder.Entity<Exam>()
+                .HasOne<Lecture>(e => e.Lecture)
+                .WithMany(l => l.Exams)
+                .HasForeignKey(e => e.LectureID);
+
+            modelBuilder.Entity<Exam>()
+                .HasOne<Student>(e => e.Student)
+                .WithMany(s => s.Exams)
+                .HasForeignKey(e => e.StudentID);
 
             // Lecture table
             modelBuilder.Entity<Lecture>(entity =>
