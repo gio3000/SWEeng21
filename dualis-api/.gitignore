@@ -130,5 +130,4 @@ dist
 .pnp.*
 
 # Created JSON Files
-modules*.json
-credentials*.json
+course.json

@@ -21,6 +21,14 @@ class Course {
     appendStudent(student) {
         this.students.push(student);
     }
+
+    /**
+     * Sets the course id from the database
+     * @param {number} courseId 
+     */
+    setCourseId(courseId) {
+        this.courseId = courseId;
+    }
 }
 
 /**
@@ -35,7 +43,10 @@ class Course {
  * @param {string} salt - Salt for the password
  * @param {string} hash - Hashed password
  * @param {string} matriculationNumber - Matriculation number of the student
+ * @param {number} userId - Id of the user in the database
+ * @param {number} studentId - Id of the student in the database
  * @param {Module[]} modules - List of modules
+ * @param {Object} dualisCredentials - Dualis credentials of the student
  */
 class Student {
     constructor(firstName, lastName, email, password, matriculationNumber) {
@@ -50,7 +61,10 @@ class Student {
             this.hash = crypto.createHmac('sha256', this.salt).update(this.password).digest('hex');
         }
         this.matriculationNumber = matriculationNumber;
+        this.userId = null;
+        this.studentId = null;
         this.modules = [];
+        this.dualisCredentials = { cookie: '', urlArguments: [] };
     }
 
     /**
@@ -59,6 +73,31 @@ class Student {
      */
     appendModule(module) {
         this.modules.push(module);
+    }
+
+    /**
+     * Sets the dualis credentials of the student
+     * @param {string} cookie - Cookie of the student
+     * @param {string[]} urlArguments - UrlArguments of the student
+     */
+    setDualisCredentials(cookie, urlArguments) {
+        this.dualisCredentials = { cookie, urlArguments };
+    }
+
+    /**
+     * Sets the user id from the database
+     * @param {number} userId
+     */
+    setUserId(userId) {
+        this.userId = userId;
+    }
+
+    /**
+     * Sets the student id from the database
+     * @param {number} studentId
+     */
+    setStudentId(studentId) {
+        this.studentId = studentId;
     }
 }
 

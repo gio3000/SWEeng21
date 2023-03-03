@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "devStart": "nodemon index.js --ignore modules.json"
+    "devStart": "nodemon index.js --ignore course.json"
   },
   "keywords": [
     "Dualis",
