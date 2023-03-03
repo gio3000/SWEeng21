@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import '../widgets/delete_secretariat_dialog.dart';
 import '../utils/constants.dart' as constants;
@@ -71,7 +72,7 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return ChangePassowrd(saveNewPassword: setNewPassword);
+        return const ChangePassowrd();
       },
     );
   }

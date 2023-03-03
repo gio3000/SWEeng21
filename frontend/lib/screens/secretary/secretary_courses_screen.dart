@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/provider/authorization_provider.dart';
+import 'package:frontend/provider/user_data_provider.dart';
 import 'package:frontend/widgets/delete_list_tile.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +20,8 @@ class _SecretaryCoursesScreenState extends State<SecretaryCoursesScreen> {
 
   @override
   void initState() {
-    Provider.of<AuthorizationProvider>(context, listen: false)
+    context
+        .read<UserDataProvider>()
         .getCourses()
         .catchError((details) => <String>[])
         .then((value) => setState(() {
@@ -74,8 +76,7 @@ unwiderruflich löschen möchtest?
         ),
         TextButton(
             onPressed: () {
-              Provider.of<AuthorizationProvider>(context, listen: false)
-                  .deleteCourse(title);
+              context.read<UserDataProvider>().deleteCourse(title);
               Navigator.of(context).pop();
             },
             child: const Text('OK'))
@@ -97,8 +98,8 @@ void _showAddCourseDialog(BuildContext context) {
             maxLength: 7,
             validator: validateAddCourseInput,
             onSaved: (text) {
-              Provider.of<AuthorizationProvider>(context, listen: false)
-                  .addCourse(text!);
+              context.read<UserDataProvider>().addCourse(text!);
+
             },
             decoration: const InputDecoration(
                 hintText: 'TIT23', label: Text('Kurskürzel')),

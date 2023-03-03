@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/provider/authorization_provider.dart';
+import 'package:frontend/provider/user_data_provider.dart';
 import 'package:frontend/widgets/delete_list_tile.dart';
 import 'package:provider/provider.dart';
 
@@ -21,9 +22,7 @@ class _SecretaryLecturerScreenState extends State<SecretaryLecturerScreen> {
   @override
   void initState() {
     super.initState();
-    Provider.of<AuthorizationProvider>(context, listen: false)
-        .getLecturer()
-        .then((value) {
+    context.read<UserDataProvider>().getLecturer().then((value) {
       setState(() {
         _isLoading = false;
         lecturers = value;
@@ -64,8 +63,7 @@ class _SecretaryLecturerScreenState extends State<SecretaryLecturerScreen> {
                 ),
                 TextButton(
                     onPressed: () {
-                      Provider.of<AuthorizationProvider>(context, listen: false)
-                          .deleteLecturer(name);
+                      context.read<UserDataProvider>().deleteLecturer(name);
                       Navigator.of(context).pop();
                     },
                     child: const Text('OK'))
@@ -93,9 +91,7 @@ class _SecretaryLecturerScreenState extends State<SecretaryLecturerScreen> {
                         return null;
                       },
                       onSaved: (newValue) {
-                        Provider.of<AuthorizationProvider>(context,
-                                listen: false)
-                            .addLecturer(newValue!);
+                        context.read<UserDataProvider>().addLecturer(newValue!);
                       },
                       decoration: const InputDecoration(
                           hintText: 'Max Müller', label: Text('Dozentenname')),
