@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/utils/authenticated_request.dart';
+import 'package:provider/provider.dart';
+import '../models/admin_user.dart';
+import '../provider/user.dart';
 import '../widgets/delete_secretariat_dialog.dart';
 import '../utils/constants.dart' as constants;
 import '../widgets/admin_list_tile.dart';
@@ -47,6 +50,16 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     );
   }
 
+  void getSecretaris() async {
+    Future<List<String>> futureSecretarys =
+        (Provider.of<User>(context, listen: false) as Admin).getSecretaries();
+    List<String> secretaries = await futureSecretarys;
+    secretariatsNames.clear();
+    setState(() {
+      secretariatsNames = secretaries;
+    });
+  }
+
 //adds passowrd to map so it can be stored to database
   void addPasswordToMap(int inedx, String password) {
     passwords[inedx] = password;
@@ -66,6 +79,12 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
         return const ChangePassowrd();
       },
     );
+  }
+
+  @override
+  void initState() {
+    getSecretaris();
+    super.initState();
   }
 
   ///opens the Dialog-Window to add new secretariat
@@ -92,10 +111,9 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   }
 
   /// add New Seccretariat to List
-  void addSecretariat(String name) {
-    setState(() {
-      secretariatsNames.add(name);
-    });
+  void addSecretariat(String name, String password) {
+    (Provider.of<User>(context, listen: false) as Admin)
+        .addSecretary(name: name, password: password);
   }
 
   ///saves index and new name to Map so it can be saved to database from Map
@@ -116,44 +134,9 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     secretaryWithResetedPassword.add(index);
   }
 
-  void getSecretarys() async {
-    var response =
-        AuthHttp.get('http://homenetwork-test.ddns.net:5160/api/getSecretarys');
-
-    // benötigt werden Namen der Sekretariate
-  }
-
-  void removeSecretary(int index) {
-    AuthHttp.delete('http://homenetwork-test.ddns.net:5160/api/removeSecretary',
-        body: index.toString());
-    // body : index
-  }
-
-  void renameSecretary(String oldName, String newName) {
-    Map<String, String> renamed = {};
-    renamed[oldName] = newName;
-    AuthHttp.put('http://homenetwork-test.ddns.net:5160/api/renameSecretary',
-        body: renamed.toString());
-    // body: {oldName: Neuer Name};
-  }
-
-  void addSecretary(String name) {
-    //TODO hash passowrd
-    Map<String, String> newSec = {};
-    newSec[name] = passwords[secretariatsNames.length]!;
-    AuthHttp.post('http://homenetwork-test.ddns.net:5160/api/newSecretary',
-        body: newSec.toString());
-    // body: {Name, passowrd}
-  }
-
-  void resetPassowrd(int index) {
-    AuthHttp.put('http://homenetwork-test.ddns.net:5160/api/resetPwd',
-        body: index.toString());
-    // body: index
-  }
-
   @override
   Widget build(BuildContext context) {
+    var _ = Provider.of<User>(context);
     return Scaffold(
         backgroundColor: constants.screenBackgroundColor,
         appBar: AppBar(
