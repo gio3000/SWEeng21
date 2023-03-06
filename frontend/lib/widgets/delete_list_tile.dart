@@ -4,7 +4,9 @@ import '../utils/constants.dart' as constants;
 
 class DeleteListTile extends StatelessWidget {
   final String title;
-  final Function onDelete; //Parameter: BuildContext, String title
+  final Function(BuildContext context, String name)
+      onDelete; //Parameter: BuildContext, String title
+  final VoidCallback? onTap;
 
   ///Creates a simple ListTile with a text on the left side and a delete button on the
   ///right side
@@ -13,6 +15,7 @@ class DeleteListTile extends StatelessWidget {
   const DeleteListTile({
     required this.title,
     required this.onDelete,
+    this.onTap,
     super.key,
   });
 
@@ -23,9 +26,7 @@ class DeleteListTile extends StatelessWidget {
       child: Card(
         elevation: 2,
         child: InkWell(
-            onTap: () {
-              //TODO
-            },
+            onTap: onTap,
             borderRadius: BorderRadius.circular(constants.cBorderRadius),
             child: Padding(
               padding: const EdgeInsets.all(constants.cPadding * 2),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frontend/models/secretary_user.dart';
-import 'package:frontend/provider/authorization_provider.dart';
 import 'package:frontend/provider/user.dart';
+import 'package:frontend/screens/secretary/secretary_single_course_screen.dart';
 import 'package:frontend/widgets/delete_list_tile.dart';
 import 'package:provider/provider.dart';
 
@@ -44,6 +44,9 @@ class _SecretaryCoursesScreenState extends State<SecretaryCoursesScreen> {
                     .map((e) => DeleteListTile(
                           title: e,
                           onDelete: onDeleteCourse,
+                          onTap: () => Navigator.of(context).pushNamed(
+                              SecretarySingleCourseScreen.routeName,
+                              arguments: e),
                         ))
                     .toList(),
               ),

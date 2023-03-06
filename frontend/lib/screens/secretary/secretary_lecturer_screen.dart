@@ -41,12 +41,16 @@ class _SecretaryLecturerScreenState extends State<SecretaryLecturerScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              children: lecturers
-                  .map((name) =>
-                      DeleteListTile(title: name, onDelete: onDeleteLecturer))
-                  .toList(),
-            ),
+          : lecturers.isEmpty
+              ? const Center(
+                  child: Text('Noch keine Dozenten hinzugefügt!'),
+                )
+              : ListView(
+                  children: lecturers
+                      .map((name) => DeleteListTile(
+                          title: name, onDelete: onDeleteLecturer))
+                      .toList(),
+                ),
     );
   }
 
