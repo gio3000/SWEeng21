@@ -21,6 +21,7 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  /// TODO add missing parameters to create full user
   ///calls necessary functions in admin_scrren to save information about new secreiat
   void saveNewSecretariat() {
     widget.addSecretariat(widget.index, _nameController.text);
@@ -33,7 +34,7 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
     return Dialog(
       child: Container(
         width: MediaQuery.of(context).size.width * 0.2,
-        height: MediaQuery.of(context).size.height * 0.37,
+        height: MediaQuery.of(context).size.height * 0.5,
         padding: const EdgeInsets.all(constants.cPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

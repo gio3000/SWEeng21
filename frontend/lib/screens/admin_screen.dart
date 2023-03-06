@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:frontend/utils/authenticated_request.dart';
 import '../widgets/delete_secretariat_dialog.dart';
 import '../utils/constants.dart' as constants;
 import '../widgets/admin_list_tile.dart';
@@ -57,15 +57,6 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     return secretariatsNames[index];
   }
 
-  ///sets new Password so it can be transfered to Database
-  void setNewPassword(
-      String oldPwd, String newPwdOne, String newPwdTwo, int index) {
-    ///TODO check if old pwd is correct
-    if (newPwdOne == newPwdTwo) {
-      newPassword = newPwdOne;
-    }
-  }
-
   ///calls Dialog to change Password
   void callChangePasswordDialog() {
     showDialog(
@@ -114,6 +105,7 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
 
   ///updates name in list when name changed
   void changeNameInList(int index, String newName) {
+    String oldname = getName(index);
     setState(() {
       secretariatsNames[index] = newName;
     });
@@ -122,6 +114,42 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   ///adds index of secretariat to List so it can be pushed to Database
   void resetPassword(int index) {
     secretaryWithResetedPassword.add(index);
+  }
+
+  void getSecretarys() async {
+    var response =
+        AuthHttp.get('http://homenetwork-test.ddns.net:5160/api/getSecretarys');
+
+    // benötigt werden Namen der Sekretariate
+  }
+
+  void removeSecretary(int index) {
+    AuthHttp.delete('http://homenetwork-test.ddns.net:5160/api/removeSecretary',
+        body: index.toString());
+    // body : index
+  }
+
+  void renameSecretary(String oldName, String newName) {
+    Map<String, String> renamed = {};
+    renamed[oldName] = newName;
+    AuthHttp.put('http://homenetwork-test.ddns.net:5160/api/renameSecretary',
+        body: renamed.toString());
+    // body: {oldName: Neuer Name};
+  }
+
+  void addSecretary(String name) {
+    //TODO hash passowrd
+    Map<String, String> newSec = {};
+    newSec[name] = passwords[secretariatsNames.length]!;
+    AuthHttp.post('http://homenetwork-test.ddns.net:5160/api/newSecretary',
+        body: newSec.toString());
+    // body: {Name, passowrd}
+  }
+
+  void resetPassowrd(int index) {
+    AuthHttp.put('http://homenetwork-test.ddns.net:5160/api/resetPwd',
+        body: index.toString());
+    // body: index
   }
 
   @override
