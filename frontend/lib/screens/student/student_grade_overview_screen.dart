@@ -20,7 +20,7 @@ class _StudentOverViewScreenState extends State<StudentOverViewScreen> {
   @override
   void initState() {
     (Provider.of<User>(context, listen: false) as Student)
-        .getGrades()
+        .getCompletedGrades()
         .then((value) => setState(() {
               gradeSubjectMapperList = value;
               _isLoading = false;
@@ -43,7 +43,8 @@ class _StudentOverViewScreenState extends State<StudentOverViewScreen> {
               : ListView(
                   children: gradeSubjectMapperList
                       .map((mapper) => GradeSubjectListTile(mapper: mapper))
-                      .toList()),
+                      .toList(),
+                ),
     );
   }
 }

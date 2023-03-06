@@ -6,6 +6,7 @@ import 'package:frontend/provider/authorization_provider.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/screens/student/student_grade_overview_screen.dart';
+import 'package:frontend/screens/student/student_statistics_screen.dart';
 import 'package:frontend/widgets/change_password.dart';
 import 'package:frontend/widgets/grade_subject_list_tile.dart';
 import 'package:frontend/widgets/screen_segment.dart';
@@ -30,7 +31,7 @@ class _StudentScreenState extends State<StudentScreen> {
   @override
   void initState() {
     (Provider.of<User>(context, listen: false) as Student)
-        .getGrades()
+        .getCompletedGrades()
         .then((value) {
       setState(() {
         gradeSubjectMapperList = value;
@@ -149,9 +150,8 @@ class _StudentScreenState extends State<StudentScreen> {
     return Column(
       children: [
         ScreenSegment(
-          onTap: () {
-            //TODO
-          },
+          onTap: () => Navigator.of(context)
+              .pushNamed(StudentStatisticsScreen.routeName),
           child: Column(children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -185,25 +185,34 @@ class _StudentScreenState extends State<StudentScreen> {
                           child: Text('Du hast noch keine Noten eingetragen!'),
                         ),
                       )
-                    : SizedBox(
-                        height: constraints.maxHeight / 2 - 50,
-                        child: SfCircularChart(
-                          series: [
-                            DoughnutSeries<GradeSubjectMapper, String>(
-                              dataLabelSettings:
-                                  const DataLabelSettings(isVisible: true),
-                              explode: true,
-                              explodeOffset: '10%',
-                              radius: '70%',
-                              xValueMapper: (GradeSubjectMapper mapper, _) =>
-                                  mapper.subjectName,
-                              yValueMapper: (GradeSubjectMapper mapper, _) =>
-                                  5.1 - mapper.grade,
-                              dataLabelMapper: (GradeSubjectMapper mapper, _) =>
-                                  mapper.subjectName,
-                              dataSource: gradeSubjectMapperList,
+                    : GestureDetector(
+                        onTap: () => Navigator.of(context)
+                            .pushNamed(StudentStatisticsScreen.routeName),
+                        child: SizedBox(
+                          height: constraints.maxHeight / 2 - 50,
+                          child: IgnorePointer(
+                            ignoring: true,
+                            child: SfCircularChart(
+                              series: [
+                                DoughnutSeries<GradeSubjectMapper, String>(
+                                  dataLabelSettings:
+                                      const DataLabelSettings(isVisible: true),
+                                  explode: false,
+                                  radius: '70%',
+                                  xValueMapper:
+                                      (GradeSubjectMapper mapper, _) =>
+                                          mapper.subjectName,
+                                  yValueMapper:
+                                      (GradeSubjectMapper mapper, _) =>
+                                          5.1 - mapper.grade,
+                                  dataLabelMapper:
+                                      (GradeSubjectMapper mapper, _) =>
+                                          mapper.subjectName,
+                                  dataSource: gradeSubjectMapperList,
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
           ]),

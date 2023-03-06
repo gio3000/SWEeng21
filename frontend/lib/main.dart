@@ -4,6 +4,7 @@ import 'package:frontend/provider/authorization_provider.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/secretary_home_screen.dart';
 import 'package:frontend/screens/student/student_grade_overview_screen.dart';
+import 'package:frontend/screens/student/student_statistics_screen.dart';
 import 'package:frontend/screens/student_screen.dart';
 import 'package:provider/provider.dart';
 import '../screens/login_screen.dart';
@@ -50,6 +51,8 @@ class MyApp extends StatelessWidget {
         SecretaryHomeScreen.routeName: (context) => const SecretaryHomeScreen(),
         StudentOverViewScreen.routeName: (context) =>
             const StudentOverViewScreen(),
+        StudentStatisticsScreen.routeName: (context) =>
+            const StudentStatisticsScreen(),
       },
     );
   }
