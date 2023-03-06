@@ -5,6 +5,7 @@ import 'package:frontend/models/student_user.dart';
 import 'package:frontend/provider/authorization_provider.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/login_screen.dart';
+import 'package:frontend/screens/student/student_grade_calculator_screen.dart';
 import 'package:frontend/screens/student/student_grade_overview_screen.dart';
 import 'package:frontend/screens/student/student_statistics_screen.dart';
 import 'package:frontend/widgets/change_password.dart';
@@ -221,7 +222,7 @@ class _StudentScreenState extends State<StudentScreen> {
         Expanded(
           child: ScreenSegment(
             onTap: () {
-              //TODO
+              Navigator.of(context).pushNamed(StudentGradeCalculator.routeName);
             },
             child: Column(
               children: [

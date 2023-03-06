@@ -36,16 +36,16 @@ class _StudentStatisticsScreenState extends State<StudentStatisticsScreen> {
       appBar: AppBar(title: const Text('Statistiken')),
       body: Padding(
         padding: const EdgeInsets.all(constants.cPadding),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                //Abgeschlossene Module Chart
-                Expanded(
-                  child: ScreenSegment(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) => SizedBox(
-                        height: constraints.maxWidth / 2 - 50,
+        child: LayoutBuilder(
+          builder: (context, constraints) => Column(
+            children: [
+              Row(
+                children: [
+                  //Abgeschlossene Module Chart
+                  Expanded(
+                    child: ScreenSegment(
+                      child: SizedBox(
+                        height: constraints.maxHeight / 2 - 50,
                         child: _isLoading
                             ? const Center(
                                 child: CircularProgressIndicator.adaptive(),
@@ -78,63 +78,50 @@ class _StudentStatisticsScreenState extends State<StudentStatisticsScreen> {
                       ),
                     ),
                   ),
-                ),
-                //verlauf chart
-                Expanded(
-                  child: ScreenSegment(
-                    child: _isLoading
-                        ? const Center(
-                            child: CircularProgressIndicator.adaptive(),
-                          )
-                        : LayoutBuilder(
-                            builder: (context, constraints) => SizedBox(
-                              height: constraints.maxWidth / 2 - 50,
-                              child: _isLoading
-                                  ? const Center(
-                                      child:
-                                          CircularProgressIndicator.adaptive(),
-                                    )
-                                  : SfCartesianChart(
-                                      title: ChartTitle(text: 'Verlauf'),
-                                      primaryXAxis: DateTimeAxis(),
-                                      series: [
-                                        LineSeries<GradeSubjectMapper,
-                                            DateTime>(
-                                          dataLabelSettings:
-                                              const DataLabelSettings(
-                                                  isVisible: true),
-                                          xValueMapper:
-                                              (GradeSubjectMapper mapper, _) =>
-                                                  mapper.examDate,
-                                          yValueMapper:
-                                              (GradeSubjectMapper mapper, _) =>
-                                                  mapper.grade,
-                                          dataLabelMapper: (GradeSubjectMapper
-                                                      mapper,
-                                                  _) =>
-                                              '${mapper.subjectName}: ${mapper.grade}',
-                                          dataSource: grades
-                                            ..sort((a, b) => a.examDate
-                                                .compareTo(b.examDate)),
-                                        ),
-                                      ],
-                                    ),
-                            ),
-                          ),
+                  //verlauf chart
+                  Expanded(
+                    child: ScreenSegment(
+                      child: SizedBox(
+                        height: constraints.maxHeight / 2 - 50,
+                        child: _isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator.adaptive())
+                            : SfCartesianChart(
+                                title: ChartTitle(text: 'Verlauf'),
+                                primaryXAxis: DateTimeAxis(),
+                                series: [
+                                  LineSeries<GradeSubjectMapper, DateTime>(
+                                    dataLabelSettings: const DataLabelSettings(
+                                        isVisible: true),
+                                    xValueMapper:
+                                        (GradeSubjectMapper mapper, _) =>
+                                            mapper.examDate,
+                                    yValueMapper:
+                                        (GradeSubjectMapper mapper, _) =>
+                                            mapper.grade,
+                                    dataLabelMapper: (GradeSubjectMapper mapper,
+                                            _) =>
+                                        '${mapper.subjectName}: ${mapper.grade}',
+                                    dataSource: grades
+                                      ..sort((a, b) =>
+                                          a.examDate.compareTo(b.examDate)),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            Expanded(
+                ],
+              ),
+              Expanded(
+                  child: ScreenSegment(
                 child: ScreenSegment(
-              child: ScreenSegment(
-                child: _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      )
-                    : LayoutBuilder(
-                        builder: (context, constraints) => SizedBox(
-                          height: constraints.maxWidth / 2 - 50,
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator.adaptive(),
+                        )
+                      : SizedBox(
+                          height: constraints.maxHeight / 2 - 50,
                           child: _isLoading
                               ? const Center(
                                   child: CircularProgressIndicator.adaptive(),
@@ -163,10 +150,10 @@ class _StudentStatisticsScreenState extends State<StudentStatisticsScreen> {
                                   ],
                                 ),
                         ),
-                      ),
-              ),
-            )),
-          ],
+                ),
+              )),
+            ],
+          ),
         ),
       ),
     );
