@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/user.dart';
 
@@ -25,6 +26,7 @@ class Admin extends User {
 
   void addSecretary({required String name, required String password}) async {
     _secretaries.add(name);
+    notifyListeners();
     //TODO add password
   }
 
@@ -34,9 +36,8 @@ class Admin extends User {
 
   void changeSecretaryName(
       {required String oldName, required String newName}) async {
-    //TODO add authhttp
-    int index = _secretaries.indexWhere((element) => element == newName);
-    _secretaries[index] = newName;
+    _secretaries[_secretaries.indexOf(oldName)] = newName;
+
     notifyListeners();
   }
 

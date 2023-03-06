@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/utils/authenticated_request.dart';
+import 'package:provider/provider.dart';
+import '../models/admin_user.dart';
+import '../provider/user.dart';
 import '../widgets/delete_secretariat_dialog.dart';
 import '../utils/constants.dart' as constants;
 import '../widgets/admin_list_tile.dart';
@@ -41,20 +44,20 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
         return MyAlertDialog(
           removeSecretary: removeSecretariat,
           index: index,
-          name: getName(index),
+          name: secretariatsNames[index],
         );
       },
     );
   }
 
-//adds passowrd to map so it can be stored to database
-  void addPasswordToMap(int inedx, String password) {
-    passwords[inedx] = password;
-  }
-
-  ///returns name of secretariat
-  String getName(int index) {
-    return secretariatsNames[index];
+  void getSecretaris() async {
+    Future<List<String>> futureSecretarys =
+        (Provider.of<User>(context, listen: false) as Admin).getSecretaries();
+    List<String> secretaries = await futureSecretarys;
+    secretariatsNames.clear();
+    setState(() {
+      secretariatsNames = secretaries;
+    });
   }
 
   ///calls Dialog to change Password
@@ -68,6 +71,12 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     );
   }
 
+  @override
+  void initState() {
+    getSecretaris();
+    super.initState();
+  }
+
   ///opens the Dialog-Window to add new secretariat
   void callAddDialog(int ind) {
     showDialog(
@@ -76,8 +85,6 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
       builder: (BuildContext context) {
         return AddSecretaryDialog(
           index: ind,
-          addPassword: addPasswordToMap,
-          addSecretariat: addNewNameToMap,
           addToList: addSecretariat,
         );
       },
@@ -86,16 +93,14 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
 
   ///removes Secretariat from List
   void removeSecretariat(int index) {
-    setState(() {
-      secretariatsNames.removeAt(index);
-    });
+    (Provider.of<User>(context, listen: false) as Admin)
+        .deleteSecretary(name: secretariatsNames[index]);
   }
 
   /// add New Seccretariat to List
-  void addSecretariat(String name) {
-    setState(() {
-      secretariatsNames.add(name);
-    });
+  void addSecretariat(String name, String password) {
+    (Provider.of<User>(context, listen: false) as Admin)
+        .addSecretary(name: name, password: password);
   }
 
   ///saves index and new name to Map so it can be saved to database from Map
@@ -105,55 +110,21 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
 
   ///updates name in list when name changed
   void changeNameInList(int index, String newName) {
-    String oldname = getName(index);
-    setState(() {
-      secretariatsNames[index] = newName;
-    });
+    if (index >= 0 && index < secretariatsNames.length) {
+      (Provider.of<User>(context, listen: false) as Admin).changeSecretaryName(
+          oldName: secretariatsNames[index], newName: newName);
+    }
   }
 
   ///adds index of secretariat to List so it can be pushed to Database
   void resetPassword(int index) {
-    secretaryWithResetedPassword.add(index);
-  }
-
-  void getSecretarys() async {
-    var response =
-        AuthHttp.get('http://homenetwork-test.ddns.net:5160/api/getSecretarys');
-
-    // benötigt werden Namen der Sekretariate
-  }
-
-  void removeSecretary(int index) {
-    AuthHttp.delete('http://homenetwork-test.ddns.net:5160/api/removeSecretary',
-        body: index.toString());
-    // body : index
-  }
-
-  void renameSecretary(String oldName, String newName) {
-    Map<String, String> renamed = {};
-    renamed[oldName] = newName;
-    AuthHttp.put('http://homenetwork-test.ddns.net:5160/api/renameSecretary',
-        body: renamed.toString());
-    // body: {oldName: Neuer Name};
-  }
-
-  void addSecretary(String name) {
-    //TODO hash passowrd
-    Map<String, String> newSec = {};
-    newSec[name] = passwords[secretariatsNames.length]!;
-    AuthHttp.post('http://homenetwork-test.ddns.net:5160/api/newSecretary',
-        body: newSec.toString());
-    // body: {Name, passowrd}
-  }
-
-  void resetPassowrd(int index) {
-    AuthHttp.put('http://homenetwork-test.ddns.net:5160/api/resetPwd',
-        body: index.toString());
-    // body: index
+    (Provider.of<User>(context, listen: false) as Admin)
+        .resetSecretaryPassword(name: secretariatsNames[index]);
   }
 
   @override
   Widget build(BuildContext context) {
+    var _ = Provider.of<User>(context);
     return Scaffold(
         backgroundColor: constants.screenBackgroundColor,
         appBar: AppBar(
@@ -191,7 +162,7 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
                     index: index,
                     callAlert: callDeleteAlert,
                     name: secretariatsNames[index],
-                    addNewNameToMap: addNewNameToMap,
+                    addNewNameToMap: changeNameInList,
                     addChangedNameToList: changeNameInList,
                     resetPassword: resetPassword,
                   ),
@@ -204,8 +175,6 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             callAddDialog((secretariatsNames.length + 1));
-            // addSecretariat(
-            //     'Sekretariat ${(int.tryParse(secretariatsNames.last.split(' ')[1]) ?? secretariatsNames.length) + 1}');
           },
           tooltip: 'Sekretariat hinzufügen',
           child: const Icon(Icons.add),
