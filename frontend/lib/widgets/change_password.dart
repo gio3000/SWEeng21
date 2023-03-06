@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/provider/user_data_provider.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:provider/provider.dart';
 import '../utils/constants.dart' as constants;
 
@@ -28,7 +28,7 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
 
   ///calls saveNewPasswordMethod from admin_screen
   void saveNewPassword() {
-    context.read<UserDataProvider>().changePassword(_oldPasswordController.text,
+    context.read<User>().changePassword(_oldPasswordController.text,
         _newPasswordFirstController.text, _newPasswordSecondController.text);
   }
 
@@ -129,4 +129,3 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
     );
   }
 }
-

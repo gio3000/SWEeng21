@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/authorization_provider.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/secretary_home_screen.dart';
 import 'package:frontend/screens/student_screen.dart';
 import 'package:provider/provider.dart';
-
 import '../screens/login_screen.dart';
 import 'screens/admin_screen.dart';
-import 'provider/user_data_provider.dart';
 
 void main() {
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) => UserDataProvider()),
-    ChangeNotifierProvider(create: (_) => AuthorizationProvider())
-  ], child: const MyApp()));
-
+  final user = User(
+      id: '', firstName: '', lastName: '', role: UserRole.student, email: '');
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthorizationProvider()),
+        ChangeNotifierProxyProvider<AuthorizationProvider, User>(
+          create: (context) => user,
+          update: (context, value, previous) {
+            return value.authorizedUser ?? user;
+          },
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -37,7 +48,6 @@ class MyApp extends StatelessWidget {
         StudentScreen.routeName: (context) => const StudentScreen(),
         SecretaryHomeScreen.routeName: (context) => const SecretaryHomeScreen(),
       },
-
     );
   }
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:frontend/models/secretary_user.dart';
 import 'package:frontend/provider/authorization_provider.dart';
-import 'package:frontend/provider/user_data_provider.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/widgets/delete_list_tile.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +23,7 @@ class _SecretaryLecturerScreenState extends State<SecretaryLecturerScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<UserDataProvider>().getLecturer().then((value) {
+    (context.read<User>() as Secretary).getLecturers().then((value) {
       setState(() {
         _isLoading = false;
         lecturers = value;
@@ -32,7 +33,7 @@ class _SecretaryLecturerScreenState extends State<SecretaryLecturerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var _ = Provider.of<AuthorizationProvider>(context);
+    var _ = Provider.of<User>(context);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () => showAddLecturerDialog(context),
@@ -63,7 +64,8 @@ class _SecretaryLecturerScreenState extends State<SecretaryLecturerScreen> {
                 ),
                 TextButton(
                     onPressed: () {
-                      context.read<UserDataProvider>().deleteLecturer(name);
+                      (context.read<User>() as Secretary)
+                          .removeLecturer(lecturerName: name);
                       Navigator.of(context).pop();
                     },
                     child: const Text('OK'))
@@ -91,7 +93,8 @@ class _SecretaryLecturerScreenState extends State<SecretaryLecturerScreen> {
                         return null;
                       },
                       onSaved: (newValue) {
-                        context.read<UserDataProvider>().addLecturer(newValue!);
+                        (context.read<User>() as Secretary)
+                            .addLecturer(lecturerName: newValue!);
                       },
                       decoration: const InputDecoration(
                           hintText: 'Max Müller', label: Text('Dozentenname')),

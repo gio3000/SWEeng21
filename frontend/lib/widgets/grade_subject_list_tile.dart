@@ -1,8 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../utils/constants.dart' as constants;
-import 'package:frontend/models/grade.dart';
+import 'package:frontend/models/grade_subject_mapper.dart';
 
 class GradeSubjectListTile extends StatelessWidget {
   final GradeSubjectMapper mapper;

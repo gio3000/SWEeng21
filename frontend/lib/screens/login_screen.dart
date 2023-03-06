@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/authorization_provider.dart';
 import 'package:frontend/screens/admin_screen.dart';
 import 'package:frontend/screens/secretary_home_screen.dart';
@@ -161,8 +164,24 @@ class LoginScreenState extends State<LoginScreen> {
     _formKey.currentState!.save();
     setState(() => _isTryingToLogin = true);
 
+    UserRole role;
+    switch (loginRoute) {
+      case SecretaryHomeScreen.routeName:
+        role = UserRole.secretary;
+        break;
+      case StudentScreen.routeName:
+        role = UserRole.student;
+        break;
+      case TechnicalAdministratorScreen.routeName:
+        role = UserRole.admin;
+        break;
+      default:
+        role = UserRole.invalid;
+        break;
+    }
+
     await Provider.of<AuthorizationProvider>(context, listen: false)
-        .authorize(email, password)
+        .authorize(email, password, role)
         .then(
           (_) => setState(
             () {

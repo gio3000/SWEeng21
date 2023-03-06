@@ -1,15 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:frontend/models/grade.dart';
+import 'package:frontend/models/grade_subject_mapper.dart';
+import 'package:frontend/models/student_user.dart';
 import 'package:frontend/provider/authorization_provider.dart';
-import 'package:frontend/provider/user_data_provider.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/widgets/change_password.dart';
 import 'package:frontend/widgets/grade_subject_list_tile.dart';
 import 'package:frontend/widgets/screen_segment.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../utils/constants.dart' as constants;
@@ -30,9 +28,8 @@ class _StudentScreenState extends State<StudentScreen> {
 
   @override
   void initState() {
-    context
-        .read<UserDataProvider>()
-        .getGradesFrom("") //TODO
+    (Provider.of<User>(context, listen: false) as Student)
+        .getGrades()
         .then((value) {
       setState(() {
         gradeSubjectMapperList = value;
