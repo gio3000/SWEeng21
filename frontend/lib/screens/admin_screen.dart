@@ -126,7 +126,6 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   void removeSecretary(int index) {
     AuthHttp.delete('http://homenetwork-test.ddns.net:5160/api/removeSecretary',
         body: index.toString());
-    debugPrint(index.toString());
     // body : index
   }
 
@@ -142,7 +141,6 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
     //TODO hash passowrd
     Map<String, String> newSec = {};
     newSec[name] = passwords[secretariatsNames.length]!;
-    debugPrint(newSec.toString());
     AuthHttp.post('http://homenetwork-test.ddns.net:5160/api/newSecretary',
         body: newSec.toString());
     // body: {Name, passowrd}
