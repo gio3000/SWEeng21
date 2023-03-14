@@ -56,7 +56,7 @@ class Student {
         this.email = email;
         this.password = password;
         this.salt = crypto.randomBytes(16).toString('hex');
-        this.hashcount = Math.floor(Math.random() * 1000) + 1;
+        this.hashcount = Math.floor(Math.random() * 20) + 1;
         for (let i = 0; i < this.hashcount; i++) {
             this.hash = crypto.createHmac('sha256', this.salt).update(this.password).digest('hex');
         }

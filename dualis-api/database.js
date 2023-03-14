@@ -13,8 +13,8 @@ const connection = await mysql.createConnection({
 
 /**
  * Gets a user from the database
- * @param {string} email 
- * @param {number} userid 
+ * @param {string} email - Email address of the user
+ * @param {number} userid - UserID of the user
  * @returns User object or null
  */
 const getUser = async (email, userid) => {
@@ -31,7 +31,7 @@ const getUser = async (email, userid) => {
 
 /**
  * Gets a secretary from the database
- * @param {number} userid 
+ * @param {number} userid - UserID of the secretary
  * @returns Secretary object or null
  */
 const getSecretary = async (userid) => {
@@ -48,7 +48,7 @@ const getSecretary = async (userid) => {
 
 /**
  * Adds a course to the database
- * @param {Course} course 
+ * @param {Course} course - Course object
  * @returns CourseID or null
  */
 const addCourse = async (course) => {
@@ -62,7 +62,7 @@ const addCourse = async (course) => {
 
 /**
  * Adds a user to the database
- * @param {Student} user 
+ * @param {Student} user - User object
  * @returns UserID or null
  */
 const addUser = async (user) => {
@@ -76,7 +76,7 @@ const addUser = async (user) => {
 
 /**
  * Gets the automatically generated student id from the database
- * @param {number} userId 
+ * @param {number} userId - UserID of the student
  * @returns StudentID or null
  */
 const getStudentId = async (userId) => {
@@ -93,8 +93,8 @@ const getStudentId = async (userId) => {
 
 /**
  * Updates the automatically generated student in the database
- * @param {number} courseId
- * @param {Student} student
+ * @param {number} courseId - CourseID of the course
+ * @param {Student} student - Student object
  * @returns true or null
  */
 const updateStudent = async (courseId, student) => {
@@ -106,4 +106,64 @@ const updateStudent = async (courseId, student) => {
     });
 }
 
-export { getUser, getSecretary, addCourse, addUser, getStudentId, updateStudent };
+/**
+ * Adds a module to the database
+ * @param {Module} module - Module object
+ * @returns ModuleID or null
+ */
+const addModule = async (module) => {
+    return connection.execute('INSERT INTO Module (Modulename, CTS) VALUES (?, ?)', [module.moduleName, module.cts]).then((result) => {
+        return result[0].insertId;
+    }).catch((err) => {
+        console.log(err);
+        return null;
+    });
+}
+
+/**
+ * Adds a course-module relationship to the database
+ * @param {number} courseId - CourseID of the course
+ * @param {number} moduleId - ModuleID of the module
+ * @returns true or null
+ */
+const addCourseModuleRel = async (courseId, moduleId) => {
+    return connection.execute('INSERT INTO CourseModuleRel (CourseID, ModuleID) VALUES (?, ?)', [courseId, moduleId]).then((result) => {
+        return result[0].insertId;
+    }).catch((err) => {
+        console.log(err);
+        return null;
+    });
+}
+
+/**
+ * Adds a lecture to the database
+ * @param {number} moduleId - ModuleID of the module
+ * @param {Lecture} lecture - Lecture object
+ * @returns LectureID or null
+ */
+const addLecture = async (lecture) => {
+    return connection.execute('INSERT INTO Lecture (ModuleID, Lecturename, CountsToAverage, Semester) VALUES (?, ?, ?, ?)', [moduleId, lecture.lectureName, lecture.countsToAverage, lecture.semester]).then((result) => {
+        return result[0].insertId;
+    }).catch((err) => {
+        console.log(err);
+        return null;
+    });
+}
+
+/**
+ * Adds an exam to the database
+ * @param {number} studentId - StudentID of the student
+ * @param {number} lectureId - LectureID of the lecture
+ * @param {Exam} exam - Exam object
+ * @returns ExamID or null
+ */
+const addExam = async (studentId, lectureId, exam) => {
+    return connection.execute('INSERT INTO Exam (StudentID, LectureID, First_Try, First_Try, First_Try) VALUES (?, ?, ?, ?, ?)', [studentId, lectureId, exam.firstTry, exam.secondTry, exam.thirdTry]).then((result) => {
+        return result[0].insertId;
+    }).catch((err) => {
+        console.log(err);
+        return null;
+    });
+}
+
+export { getUser, getSecretary, addCourse, addUser, getStudentId, updateStudent, addModule, addCourseModuleRel, addLecture, addExam };
