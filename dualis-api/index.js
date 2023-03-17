@@ -46,6 +46,7 @@ app.post('/', verifyToken, async (req, res) => {
         if (err.message.includes('Login failed')) {
             res.status(400).send(err.message);
         } else {
+            console.log(err);
             res.status(500).send('Internal server error');
         }
         return;
@@ -53,6 +54,7 @@ app.post('/', verifyToken, async (req, res) => {
     //console.log(util.inspect(course, false, null, true));
     fs.writeFileSync('course.json', JSON.stringify(course, null, 2));
 
+    /*
     course.setCourseId(3);
     const requests2 = course.students.map(async (student) => {
         return new Promise(async (resolve, reject) => {
@@ -69,6 +71,7 @@ app.post('/', verifyToken, async (req, res) => {
         });
     });
     await Promise.all(requests2);
+    */
 
     res.status(200).send('Hello World!');
 });

@@ -65,7 +65,7 @@ const gradeStringToPercentPoints = (gradeString, weightage = 100) => {
 const removeModuleDataDuplicates = (moduleData) => {
     const seen = new Set();
     return moduleData.filter(item => {
-        const key = JSON.stringify([item.argument, item.cts]);
+        const key = JSON.stringify([item.path, item.cts]);
         if (seen.has(key)) {
             return false;
         }

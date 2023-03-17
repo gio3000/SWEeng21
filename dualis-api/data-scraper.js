@@ -1,4 +1,5 @@
 import got from 'got';
+import { JSDOM } from 'jsdom';
 import { Student, Module, Lecture, Exam } from './classes.js';
 import { gradeStringToPercentPoints, removeModuleDataDuplicates } from './helper.js';
 
@@ -43,12 +44,13 @@ const getSemesterArguments = async (student) => {
 
     let semesterArguments = [];
 
-    let semesterString = response.body.split('<select id="semester"')[1].split('</select>')[0].split('class="tabledata">')[1].replaceAll('\t', '').split('\r\n');
-    for (let i = 0; i < semesterString.length; i++) {
-        if (semesterString[i].includes('option')) {
-            semesterArguments.push(semesterString[i].split('value="')[1].split('"')[0]);
-        }
+    const dom = new JSDOM(response.body);
+
+    let semesterDropdown = dom.window.document.getElementsByTagName('option');
+    for (const option of semesterDropdown) {
+        semesterArguments.push(option.value);
     }
+
     return semesterArguments;
 }
 
@@ -59,7 +61,6 @@ const getSemesterArguments = async (student) => {
  * @returns list of module data
  */
 const getModuleData = async (student, semesterArguments) => {
-    let moduleData = [];
     const requests = semesterArguments.map(semesterArgument => {
         const url = `https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=COURSERESULTS&ARGUMENTS=${student.dualisCredentials.urlArguments.slice(0, 2).join(',')},-N${semesterArgument}`;
         return got.get(url, {
@@ -68,14 +69,20 @@ const getModuleData = async (student, semesterArguments) => {
             }
         });
     });
+
     const responses = await Promise.all(requests);
+
+    let moduleData = [];
+
     for (const response of responses) {
-        let modules = response.body.split('<tbody>')[1].split('</tbody>')[0].replaceAll('\t', '').replaceAll('  ', '').split('</tr>');
-        for (const moduleLine of modules) {
-            if (moduleLine.includes('href')) {
-                let module = {};
-                module.argument = moduleLine.split('dl_popUp("')[1].split('"')[0];
-                module.cts = parseInt(moduleLine.split('"tbdata_numeric">')[1].split('</td>')[0].split(',')[0]);
+        const dom = new JSDOM(response.body);
+        let tableBody = dom.window.document.getElementsByTagName('tbody')[0];
+        let tableRows = tableBody.getElementsByTagName('tr');
+        for (const tableRow of tableRows) {
+            if (tableRow.innerHTML.includes('href')) {
+                const module = {};
+                module.path = tableRow.getElementsByTagName('script')[0].innerHTML.split('dl_popUp("')[1].split('"')[0];
+                module.cts = parseInt(tableRow.getElementsByClassName('tbdata_numeric')[1].innerHTML.split(',')[0]);
                 moduleData.push(module);
             }
         }
@@ -92,55 +99,74 @@ const getModuleData = async (student, semesterArguments) => {
  */
 const getModules = async (student, moduleData) => {
     const requests = moduleData.map(moduleDataObj => {
-        const url = `https://dualis.dhbw.de${moduleDataObj.argument}`;
+        const url = `https://dualis.dhbw.de${moduleDataObj.path}`;
         return got.get(url, {
             headers: {
                 'Cookie': student.dualisCredentials.cookie
             }
         });
     });
+
     const responses = await Promise.all(requests);
+
     for (let i = 0; i < responses.length; i++) {
         const response = responses[i];
 
-        const moduleName = response.body.split('<h1>')[1].split('&nbsp;\r\n')[1].split(' (')[0];
+        const dom = new JSDOM(response.body);
+
+        const moduleName = dom.window.document.getElementsByTagName('h1')[0].innerHTML.split('&nbsp;\n')[1].split(' (')[0];
         const cts = moduleData[i].cts;
         const module = new Module(moduleName, cts);
 
-        let gradeTableRows = response.body.split('<table')[1].split('</table>')[0].replaceAll('\t', '').replaceAll('  ', '').split('</tr>');
-        if (gradeTableRows[3].includes('Modulabschlussleistungen')) {
-            if (gradeTableRows[5].includes('Gesamt')) {
+        const table = dom.window.document.getElementsByTagName('table')[0];
+        const tableRows = Array.from(table.getElementsByTagName('tr')).slice(3);
+
+        if (tableRows[0].innerHTML.includes('Modulabschlussleistungen')) {
+            if (tableRows[2].innerHTML.includes('Gesamt')) {
                 // Modulabschlussleistungen mit nur einer Note
-                let rowColumns = gradeTableRows[4].split('</td>');
+                const rowColumns1T = tableRows[1].getElementsByTagName('td');
 
                 const lectureName = module.moduleName;
-                const semester = rowColumns[0].split('">')[1];
+                const semester = rowColumns1T[0].innerHTML;
                 const countsToAverage = true;
 
-                let gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
-                const firstTry = gradeStringToPercentPoints(gradeString);
+                const gradeString1T = rowColumns1T[3].innerHTML;
+                const firstTry = gradeStringToPercentPoints(gradeString1T);
+
                 const exam = new Exam(firstTry);
-                if (gradeTableRows[6].includes('Versuch2')) {
-                    rowColumns = gradeTableRows[8].split('</td>');
-                    gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
-                    const secondTry = gradeStringToPercentPoints(gradeString);
+
+                // Parse second try
+                if (tableRows.length > 6 && tableRows[3].innerHTML.includes('Versuch  2')) {
+                    const rowColumns2T = tableRows[5].getElementsByTagName('td');
+                    const gradeString2T = rowColumns2T[3].innerHTML;
+                    const secondTry = gradeStringToPercentPoints(gradeString2T);
                     exam.addSecondTry(secondTry);
                 }
+
+                // Parse third try
+                if (tableRows.length > 10 && tableRows[7].innerHTML.includes('Versuch  3')) {
+                    const rowColumns3T = tableRows[9].getElementsByTagName('td');
+                    const gradeString3T = rowColumns3T[3].innerHTML;
+                    const thirdTry = gradeStringToPercentPoints(gradeString3T);
+                    exam.addThirdTry(thirdTry);
+                }
+
                 const lecture = new Lecture(lectureName, semester, countsToAverage, exam);
                 module.appendLecture(lecture);
             }
             else {
                 // Modulabschlussleistungen mit mehreren Noten
                 // TODO Parsen bei Versuch 2 machen
-                const semester = gradeTableRows[4].split('</td>')[0].split('">')[1];
-                for (let row of gradeTableRows.slice(5)) {
-                    if (!row.includes('Gesamt')) {
-                        let rowColumns = row.split('</td>');
+                const semester = tableRows[1].getElementsByTagName('td')[0].innerHTML;
 
-                        const lectureName = rowColumns[1].split('&nbsp;&nbsp;')[1];
+                for (const row of tableRows.slice(2)) {
+                    if (!row.innerHTML.includes('Gesamt')) {
+                        let rowColumns1T = row.getElementsByTagName('td');
+
+                        const lectureName = rowColumns1T[1].innerHTML.replaceAll('&nbsp;&nbsp;', '');
                         const countsToAverage = true;
 
-                        const firstTry = parseInt(rowColumns[3].split('>')[1].split('<')[0].split(',')[0]);
+                        const firstTry = parseInt(rowColumns1T[3].innerHTML.split(',')[0]);
                         const exam = new Exam(firstTry);
 
                         const lecture = new Lecture(lectureName, semester, countsToAverage, exam);
@@ -154,62 +180,71 @@ const getModules = async (student, moduleData) => {
         }
         else {
             // Modul mit mehreren getrennten Vorlesungen
-            // TODO Parsen von Versuch 2 machen
-            gradeTableRows = gradeTableRows.slice(3);
             let tryCount = 1;
-            for (let i = 0; i < gradeTableRows.length / 2; i++) {
-                // Check if lecture already exists when multiple tries
-                let found = false;
-                let lecture = {};
-                lecture.lectureName = gradeTableRows[i * 2].split('">')[1].split(' ').slice(1).join(' ').split(' (')[0].split('</td>')[0];
-                let exam = {};
-                let rowColumns = gradeTableRows[i * 2 + 1].split('</td>');
-                if (tryCount >= 2) {
-                    module.lectures.forEach(lectureElem => {
-                        if (lectureElem.lectureName === lecture.lectureName) {
-                            lecture = lectureElem;
-                            exam = lecture.exam;
-                            found = true;
-                        }
-                    });
-                }
-                if (rowColumns.length > 1) {
-                    lecture.semester = rowColumns[0].split('">')[1];
-                    if (rowColumns[0].includes('Versuch2')) {
+            for (let i = 0; i < tableRows.length / 2; i++) {
+                let rowColumns = tableRows[i * 2 + 1]?.getElementsByTagName('td');
+
+                // Check if row contains data
+                if (rowColumns) {
+                    if (rowColumns[0].innerHTML.includes('Versuch  2')) {
+                        // Indicate that the next lectures are the second try
                         tryCount = 2;
                     }
-                    else if (rowColumns[0].includes('Versuch3')) {
+                    else if (rowColumns[0].innerHTML.includes('Versuch  3')) {
+                        // Indicate that the next lectures are the third try
                         tryCount = 3;
                     }
                     else {
-                        let gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
-                        const weightage = parseInt(rowColumns[1].split('(')[1].split('%)')[0]);
-                        lecture.countsToAverage = weightage > 0;
+                        // Indicates that this row contains a lecture
+                        let found = false;
+
+                        let lecture = {};
+                        const lectureName = tableRows[i * 2].getElementsByTagName('td')[0].innerHTML.split(' ').slice(1).join(' ').split(' (')[0];
+                        const semester = rowColumns[0].innerHTML;
+                        let countsToAverage = true;
+                        let exam = {};
+
+                        // Check if lecture already exists when multiple tries
+                        if (tryCount >= 2) {
+                            module.lectures.forEach(lectureElem => {
+                                if (lectureElem.lectureName === lectureName) {
+                                    lecture = lectureElem;
+                                    exam = lecture.exam;
+                                    found = true;
+                                }
+                            });
+                        }
+
+                        // Parse grade
+                        const gradeString = rowColumns[3].innerHTML;
+                        const weightage = parseInt(rowColumns[1].innerHTML.split('(')[1].split('%)')[0]);
+                        countsToAverage = weightage > 0;
                         let grade = gradeStringToPercentPoints(gradeString, weightage);
+
+                        // Set exam grade
                         if (tryCount === 1 || !found || exam.first_try === grade) {
-                            exam.first_try = grade;
-                            exam.second_try = null;
-                            exam.third_try = null;
+                            // Create new exam if it is the first try or if the exam does not exist yet or if the grade is the same as the first try (e.g. when the second lecture is not passed, then the first lecture is again displayed)
+                            exam = new Exam(grade);
                         }
                         else if (tryCount === 2) {
-                            exam.second_try = grade;
+                            exam.addSecondTry(grade);
                         }
                         else if (tryCount === 3) {
-                            exam.third_try = grade;
+                            exam.addThirdTry(grade);
                         }
                         if (gradeString.includes('b')) {
                             // Modul/Prüfungsleistung ist bestanden aber hat keine Note, wird also nicht bewertet
-                            // TODO Besseren Weg finden um festzuhalten
-                            lecture.countsToAverage = false;
+                            countsToAverage = false;
                         }
-                        lecture.exam = exam;
-                        if (tryCount === 1) {
+                        if (!found) {
+                            lecture = new Lecture(lectureName, semester, countsToAverage, exam);
                             module.lectures.push(lecture);
                         }
                     }
                 }
             }
         }
+
         // set countsToAverage to false if module is not graded
         if (module.cts === 0) {
             for (let lecture of module.lectures) {
