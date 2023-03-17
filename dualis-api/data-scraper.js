@@ -4,7 +4,8 @@ import { gradeStringToPercentPoints, removeModuleDataDuplicates } from './helper
 
 /**
  * Logs a student in
- * @param {Student} student - Student to be logged in 
+ * @param {Student} student - Student to be logged in
+ * @raises Error if login failed
  */
 const login = async (student) => {
     const response = await got.post('https://dualis.dhbw.de/scripts/mgrqispi.dll', {
@@ -19,9 +20,12 @@ const login = async (student) => {
             'menu_type': 'classic'
         }
     });
-
-    student.dualisCredentials.cookie = response.headers['set-cookie'][0].split(';')[0].replace(' ', '');
-    student.dualisCredentials.urlArguments = response.headers['refresh'].split('ARGUMENTS=')[1].split(',');
+    try {
+        student.dualisCredentials.cookie = response.headers['set-cookie'][0].split(';')[0].replace(' ', '');
+        student.dualisCredentials.urlArguments = response.headers['refresh'].split('ARGUMENTS=')[1].split(',');
+    } catch (error) {
+        throw new Error(`Login failed for ${student.email}`);
+    }
 }
 
 /**

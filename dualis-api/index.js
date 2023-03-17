@@ -40,7 +40,16 @@ app.post('/', verifyToken, async (req, res) => {
         course.appendStudent(newStudent);
     }
     const requests = course.students.map(student => fetchModules(student));
-    await Promise.all(requests);
+    try {
+        await Promise.all(requests);
+    } catch (err) {
+        if (err.message.includes('Login failed')) {
+            res.status(400).send(err.message);
+        } else {
+            res.status(500).send('Internal server error');
+        }
+        return;
+    }
     //console.log(util.inspect(course, false, null, true));
     fs.writeFileSync('course.json', JSON.stringify(course, null, 2));
 
