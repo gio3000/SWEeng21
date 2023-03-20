@@ -102,7 +102,10 @@ namespace RESTful_API.Models
                 entity.Property(e => e.ModuleID).IsUnicode(false);
                 entity.Property(e => e.LectureName).HasMaxLength(40).IsUnicode(true);
             });
-            modelBuilder.Entity<Lecture>().HasOne<Module>().WithMany().HasForeignKey(e => e.ModuleID);
+            modelBuilder.Entity<Lecture>()
+                .HasOne<Module>(l => l.Module)
+                .WithMany(m => m.Lectures)
+                .HasForeignKey(l => l.ModuleID);
 
             // Lecturer table
             modelBuilder.Entity<Lecturer>(entity =>
@@ -111,18 +114,23 @@ namespace RESTful_API.Models
                 entity.Property(e => e.LecturerID).HasColumnName("LecturerID");
                 entity.Property(e => e.UserID).IsUnicode(false);
             });
-            modelBuilder.Entity<Lecturer>().HasOne<User>().WithMany().HasForeignKey(e => e.UserID);
+            modelBuilder.Entity<Lecturer>()
+                .HasOne<User>(l => l.User)
+                .WithMany(u => u.Lecturers)
+                .HasForeignKey(l => l.UserID);
 
             // LecturerLectureRel table
-            modelBuilder.Entity<LecturerLectureRel>(entity =>
-            {
-                entity.ToTable("LecturerLectureRel");
-                entity.HasNoKey();
-                entity.Property(e => e.LecturerID).HasColumnName("LecturerID");
-                entity.Property(e => e.LectureID).HasColumnName("LectureID");
-            });
-            modelBuilder.Entity<LecturerLectureRel>().HasOne<Lecturer>().WithMany().HasForeignKey(e => e.LecturerID);
-            modelBuilder.Entity<LecturerLectureRel>().HasOne<Lecture>().WithMany().HasForeignKey(e => e.LectureID);
+            modelBuilder.Entity<LecturerLectureRel>().HasKey(ll => new { ll.LecturerID, ll.LectureID });
+
+            modelBuilder.Entity<LecturerLectureRel>()
+                .HasOne<Lecturer>(ll => ll.Lecturer)
+                .WithMany(l => l.LecturerLectureRels)
+                .HasForeignKey(ll => ll.LecturerID);
+
+            modelBuilder.Entity<LecturerLectureRel>()
+                .HasOne<Lecture>(ll => ll.Lecture)
+                .WithMany(l => l.LecturerLectureRels)
+                .HasForeignKey(l => l.LectureID);
 
             // Module table
             modelBuilder.Entity<Module>(entity =>
@@ -142,6 +150,10 @@ namespace RESTful_API.Models
                 entity.Property(e => e.UserID).IsUnicode(false);
                 entity.Property(e => e.Name).HasMaxLength(40).IsUnicode(true); 
             });
+            modelBuilder.Entity<Secretary>()
+                .HasOne<User>(s => s.User)
+                .WithMany(u => u.Secretaries)
+                .HasForeignKey(s => s.UserID);
 
             // Student table
             modelBuilder.Entity<Student>(entity =>
@@ -152,8 +164,15 @@ namespace RESTful_API.Models
                 entity.Property(e => e.UserID).IsUnicode(false);
                 entity.Property(e => e.MatriculationNr).IsUnicode(false);
             });
-            modelBuilder.Entity<Student>().HasOne<User>().WithMany().HasForeignKey(e => e.UserID);
-            modelBuilder.Entity<Student>().HasOne<Course>().WithMany().HasForeignKey(e => e.CourseID);
+            modelBuilder.Entity<Student>()
+                .HasOne<User>(s => s.User)
+                .WithMany(u => u.Students)
+                .HasForeignKey(s => s.UserID);
+
+            modelBuilder.Entity<Student>()
+                .HasOne<Course>(s => s.Course)
+                .WithMany(c => c.Students)
+                .HasForeignKey(s => s.CourseID);
 
             OnModelCreatingPartial(modelBuilder);
         }

@@ -6,7 +6,9 @@ namespace RESTful_API.Models
     {
         public int StudentID { get; set; }
         public int CourseID { get; set; }
+        public Course? Course { get; set; }
         public int UserID { get; set; }
+        public User? User { get; set; }
         public int MatriculationNr { get; set; }
 
         [JsonIgnore]

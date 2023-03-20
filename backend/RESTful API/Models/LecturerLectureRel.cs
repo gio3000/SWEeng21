@@ -6,6 +6,8 @@ namespace RESTful_API.Models
     public class LecturerLectureRel
     {
         public int LecturerID { get; set; }
+        public Lecturer? Lecturer { get; set; }
         public int LectureID { get; set; }
+        public Lecture? Lecture { get; set; }
     }
 }

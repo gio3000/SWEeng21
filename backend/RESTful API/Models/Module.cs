@@ -11,5 +11,8 @@ namespace RESTful_API.Models
 
         [JsonIgnore]
         public virtual IList<CourseModuleRel>? CourseModuleRels { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<Lecture>? Lectures { get; set; }
     }
 }

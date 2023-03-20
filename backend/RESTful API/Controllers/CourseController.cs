@@ -10,7 +10,7 @@ namespace RESTful_API.Controllers
 {
     [EnableCors("MyPolicy")]
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/course")]
     [ApiController]
     public class CourseController : ControllerBase
     {

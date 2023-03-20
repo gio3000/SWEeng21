@@ -14,5 +14,11 @@ namespace RESTful_API.Models
 
         [JsonIgnore]
         public virtual ICollection<Admin>? Admins { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<Lecturer>? Lecturers { get; set;}
+        [JsonIgnore]
+        public virtual ICollection<Secretary>? Secretaries { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<Student>? Students { get; set; }
     }
 }
