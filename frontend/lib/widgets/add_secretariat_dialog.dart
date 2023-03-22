@@ -3,15 +3,12 @@ import '../utils/constants.dart' as constants;
 
 class AddSecretaryDialog extends StatefulWidget {
   final int index;
-  final Function addPassword;
   final Function addSecretariat;
-  final Function addToList;
-  const AddSecretaryDialog(
-      {super.key,
-      required this.index,
-      required this.addPassword,
-      required this.addSecretariat,
-      required this.addToList});
+  const AddSecretaryDialog({
+    super.key,
+    required this.index,
+    required this.addSecretariat,
+  });
 
   @override
   State<AddSecretaryDialog> createState() => AddSecretaryDialogState();
@@ -24,9 +21,7 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
   /// TODO add missing parameters to create full user
   ///calls necessary functions in admin_scrren to save information about new secreiat
   void saveNewSecretariat() {
-    widget.addSecretariat(widget.index, _nameController.text);
-    widget.addPassword(widget.index, _passwordController.text);
-    widget.addToList(_nameController.text);
+    widget.addSecretariat(_nameController.text, _passwordController.text);
   }
 
   @override

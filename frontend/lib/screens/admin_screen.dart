@@ -85,7 +85,7 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
       builder: (BuildContext context) {
         return AddSecretaryDialog(
           index: ind,
-          addToList: addSecretariat,
+          addSecretariat: addSecretariat,
         );
       },
     );
