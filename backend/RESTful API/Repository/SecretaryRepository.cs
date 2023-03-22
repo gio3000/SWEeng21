@@ -57,7 +57,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-                return _dbContext.Secretarys.Include(u => u.UserID).ToList();
+                return _dbContext.Secretarys.Include(s => s.User).ToList();
             }
             catch
             {
@@ -70,7 +70,7 @@ namespace RESTful_API.Repository
             try
             {
                 Secretary? secretary= _dbContext.Secretarys
-                    .Include(u => u.UserID)
+                    .Include(s => s.User)
                     .Single(s => s.SecretaryID == id);
                 if (secretary != null)
                 {

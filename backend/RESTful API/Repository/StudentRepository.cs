@@ -58,8 +58,8 @@ namespace RESTful_API.Repository
             try
             {
                 Student? student = _dbContext.Students
-                    .Include(u => u.UserID)
-                    .Include(c => c.CourseID)
+                    .Include(s => s.User)
+                    .Include(s => s.Course)
                     .Single(s => s.StudentID == id);
                 if (student != null)
                 {
@@ -81,8 +81,8 @@ namespace RESTful_API.Repository
             try
             {
                 return _dbContext.Students
-                    .Include(u => u.UserID)
-                    .Include(c => c.CourseID)
+                    .Include(s => s.User)
+                    .Include(s => s.Course)
                     .ToList();
             }
             catch

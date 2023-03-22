@@ -58,7 +58,7 @@ namespace RESTful_API.Repository
             try
             {
                 Lecturer? lecturer = _dbContext.Lecturers
-                    .Include(u => u.UserID)
+                    .Include(l => l.User)
                     .Single(l => l.LecturerID == id);
                 if (lecturer != null)
                 {
@@ -79,7 +79,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-                return _dbContext.Lecturers.Include(u => u.UserID).ToList();
+                return _dbContext.Lecturers.Include(l => l.User).ToList();
             }
             catch
             {
