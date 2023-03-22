@@ -1,6 +1,6 @@
 import fetchModules from './data-scraper.js';
-import verifyCourse from './data-verifier.js';
-import { Course, Student, Module, Lecture, Exam } from './classes.js';
+import formatCourseData from './data-formater.js';
+import { Course, Student } from './classes.js';
 import { addUser, addCourse, updateStudent, getStudentId } from './database.js';
 import { verifyToken } from './authentication.js';
 import util from 'util';
@@ -51,6 +51,12 @@ app.post('/', verifyToken, async (req, res) => {
         }
         return;
     }
+
+    for (let i = 0; i < course.students.length; i++) {
+        course.students[i].setStudentId(i + 1);
+    }
+
+    formatCourseData(course);
     //console.log(util.inspect(course, false, null, true));
     fs.writeFileSync('course.json', JSON.stringify(course, null, 2));
 

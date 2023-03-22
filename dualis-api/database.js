@@ -108,7 +108,7 @@ const updateStudent = async (courseId, student) => {
 
 /**
  * Adds a module to the database
- * @param {Module} module - Module object
+ * @param {CourseModule} module - Module object
  * @returns ModuleID or null
  */
 const addModule = async (module) => {
@@ -138,10 +138,10 @@ const addCourseModuleRel = async (courseId, moduleId) => {
 /**
  * Adds a lecture to the database
  * @param {number} moduleId - ModuleID of the module
- * @param {Lecture} lecture - Lecture object
+ * @param {CourseLecture} lecture - Lecture object
  * @returns LectureID or null
  */
-const addLecture = async (lecture) => {
+const addLecture = async (moduleId, lecture) => {
     return connection.execute('INSERT INTO Lecture (ModuleID, Lecturename, CountsToAverage, Semester) VALUES (?, ?, ?, ?)', [moduleId, lecture.lectureName, lecture.countsToAverage, lecture.semester]).then((result) => {
         return result[0].insertId;
     }).catch((err) => {
@@ -152,13 +152,11 @@ const addLecture = async (lecture) => {
 
 /**
  * Adds an exam to the database
- * @param {number} studentId - StudentID of the student
- * @param {number} lectureId - LectureID of the lecture
- * @param {Exam} exam - Exam object
+ * @param {CourseExam} exam - Exam object
  * @returns ExamID or null
  */
-const addExam = async (studentId, lectureId, exam) => {
-    return connection.execute('INSERT INTO Exam (StudentID, LectureID, First_Try, First_Try, First_Try) VALUES (?, ?, ?, ?, ?)', [studentId, lectureId, exam.firstTry, exam.secondTry, exam.thirdTry]).then((result) => {
+const addExam = async (exam) => {
+    return connection.execute('INSERT INTO Exam (StudentID, LectureID, First_Try, First_Try, First_Try) VALUES (?, ?, ?, ?, ?)', [exam.studentId, lectureId, exam.firstTry, exam.secondTry, exam.thirdTry]).then((result) => {
         return result[0].insertId;
     }).catch((err) => {
         console.log(err);

@@ -1,6 +1,6 @@
 import got from 'got';
 import { JSDOM } from 'jsdom';
-import { Student, Module, Lecture, Exam } from './classes.js';
+import { Student, DualisModule, DualisLecture, DualisExam } from './classes.js';
 import { gradeStringToPercentPoints, removeModuleDataDuplicates } from './helper.js';
 
 /**
@@ -116,7 +116,7 @@ const getModules = async (student, moduleData) => {
 
         const moduleName = dom.window.document.getElementsByTagName('h1')[0].innerHTML.split('&nbsp;\n')[1].split(' (')[0];
         const cts = moduleData[i].cts;
-        const module = new Module(moduleName, cts);
+        const module = new DualisModule(moduleName, cts);
 
         const table = dom.window.document.getElementsByTagName('table')[0];
         const tableRows = Array.from(table.getElementsByTagName('tr')).slice(3);
@@ -133,7 +133,7 @@ const getModules = async (student, moduleData) => {
                 const gradeString1T = rowColumns1T[3].innerHTML;
                 const firstTry = gradeStringToPercentPoints(gradeString1T);
 
-                const exam = new Exam(firstTry);
+                const exam = new DualisExam(firstTry);
 
                 // Parse second try
                 if (tableRows.length > 6 && tableRows[3].innerHTML.includes('Versuch  2')) {
@@ -151,7 +151,7 @@ const getModules = async (student, moduleData) => {
                     exam.addThirdTry(thirdTry);
                 }
 
-                const lecture = new Lecture(lectureName, semester, countsToAverage, exam);
+                const lecture = new DualisLecture(lectureName, semester, countsToAverage, exam);
                 module.appendLecture(lecture);
             }
             else {
@@ -167,9 +167,9 @@ const getModules = async (student, moduleData) => {
                         const countsToAverage = true;
 
                         const firstTry = parseInt(rowColumns1T[3].innerHTML.split(',')[0]);
-                        const exam = new Exam(firstTry);
+                        const exam = new DualisExam(firstTry);
 
-                        const lecture = new Lecture(lectureName, semester, countsToAverage, exam);
+                        const lecture = new DualisLecture(lectureName, semester, countsToAverage, exam);
                         module.appendLecture(lecture);
                     }
                     else {
@@ -224,7 +224,7 @@ const getModules = async (student, moduleData) => {
                         // Set exam grade
                         if (tryCount === 1 || !found || exam.first_try === grade) {
                             // Create new exam if it is the first try or if the exam does not exist yet or if the grade is the same as the first try (e.g. when the second lecture is not passed, then the first lecture is again displayed)
-                            exam = new Exam(grade);
+                            exam = new DualisExam(grade);
                         }
                         else if (tryCount === 2) {
                             exam.addSecondTry(grade);
@@ -237,7 +237,7 @@ const getModules = async (student, moduleData) => {
                             countsToAverage = false;
                         }
                         if (!found) {
-                            lecture = new Lecture(lectureName, semester, countsToAverage, exam);
+                            lecture = new DualisLecture(lectureName, semester, countsToAverage, exam);
                             module.lectures.push(lecture);
                         }
                     }
@@ -251,7 +251,7 @@ const getModules = async (student, moduleData) => {
                 lecture.countsToAverage = false;
             }
         }
-        student.appendModule(module);
+        student.appendDualisModule(module);
     }
 }
 
