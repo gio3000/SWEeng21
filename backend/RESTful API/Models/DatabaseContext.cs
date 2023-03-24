@@ -33,10 +33,14 @@ namespace RESTful_API.Models
                 entity.Property(e => e.UserID).HasColumnName("UserID");
                 entity.Property(e => e.First_Name).HasMaxLength(40).IsUnicode(true);
                 entity.Property(e => e.Last_Name).HasMaxLength(40).IsUnicode(true);
+                entity.Property(e => e.Role).HasConversion<string>().IsUnicode(false);
                 entity.Property(e => e.Email).HasMaxLength(60).IsUnicode(true);
-                entity.Property(e => e.Hash_Count).IsUnicode(false);
-                entity.Property(e => e.Salt).HasMaxLength(32).IsUnicode(true);
                 entity.Property(e => e.Password).HasMaxLength(64).IsUnicode(true);
+                entity.Property(e => e.Initial_Password).HasMaxLength(64).IsUnicode(true);
+                entity.Property(e => e.Salt).HasMaxLength(32).IsUnicode(true);
+                entity.Property(e => e.Initial_Salt).HasMaxLength(32).IsUnicode(true);
+                entity.Property(e => e.Hash_Count).IsUnicode(false);
+
             });
 
             // Admin table
@@ -57,7 +61,13 @@ namespace RESTful_API.Models
                 entity.ToTable("Course");
                 entity.Property(e => e.CourseID).HasColumnName("CourseID");
                 entity.Property(e => e.CourseName).HasMaxLength(10).IsUnicode(true);
+                entity.Property(e => e.SecretaryID).IsUnicode(false);
             });
+
+            modelBuilder.Entity<Course>()
+                .HasOne<Secretary>(c => c.Secretary)
+                .WithMany(s => s.Courses)
+                .HasForeignKey(c => c.SecretaryID);
 
             // CourseModuleRel table
             modelBuilder.Entity<CourseModuleRel>().HasKey(cm => new { cm.CourseID, cm.ModuleID });
@@ -80,9 +90,9 @@ namespace RESTful_API.Models
                 entity.Property(e => e.ExamID).HasColumnName("ExamID");
                 entity.Property(e => e.LectureID).IsUnicode(false);
                 entity.Property(e => e.StudentID).IsUnicode(false);
-                entity.Property(e => e.Grade).IsUnicode(false);
-                entity.Property(e => e.Semester).HasMaxLength(20).IsUnicode(true);
-                entity.Property(e => e.CountToAverage).IsUnicode(false);
+                entity.Property(e => e.First_Try).IsUnicode(false).HasDefaultValue(null);
+                entity.Property(e => e.Second_Try).IsUnicode(false).HasDefaultValue(null);
+                entity.Property(e => e.Third_Try).IsUnicode(false).HasDefaultValue(null);
             });
             modelBuilder.Entity<Exam>()
                 .HasOne<Lecture>(e => e.Lecture)
@@ -101,6 +111,8 @@ namespace RESTful_API.Models
                 entity.Property(e => e.LectureID).HasColumnName("LectureID");
                 entity.Property(e => e.ModuleID).IsUnicode(false);
                 entity.Property(e => e.LectureName).HasMaxLength(40).IsUnicode(true);
+                entity.Property(e => e.CountsToAverage).IsUnicode(false);
+                entity.Property(e => e.Semester).HasMaxLength(40).IsUnicode(true);
             });
             modelBuilder.Entity<Lecture>()
                 .HasOne<Module>(l => l.Module)
@@ -139,7 +151,6 @@ namespace RESTful_API.Models
                 entity.Property(e => e.ModuleID).HasColumnName("ModuleID");
                 entity.Property(e => e.ModuleName).HasMaxLength(40).IsUnicode(true);
                 entity.Property(e => e.CTS).IsUnicode(false);
-                entity.Property(e => e.Status).HasMaxLength(20).IsUnicode(true);
             });
 
             // Secretary table

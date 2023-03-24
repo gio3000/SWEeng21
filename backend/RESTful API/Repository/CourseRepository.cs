@@ -58,7 +58,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-                Course? course = _dbContext.Courses.Single(a => a.CourseID == id);
+                Course? course = _dbContext.Courses.Include(c => c.Secretary).Single(a => a.CourseID == id);
                 if (course != null)
                 {
                     return course;
@@ -78,7 +78,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-                return _dbContext.Courses.ToList();
+                return _dbContext.Courses.Include(c => c.Secretary).ToList();
             }
             catch
             {
