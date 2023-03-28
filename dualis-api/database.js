@@ -153,10 +153,11 @@ const addLecture = async (moduleId, lecture) => {
 /**
  * Adds an exam to the database
  * @param {CourseExam} exam - Exam object
+ * @param {number} lectureId - LectureID of the lecture
  * @returns ExamID or null
  */
-const addExam = async (exam) => {
-    return connection.execute('INSERT INTO Exam (StudentID, LectureID, First_Try, First_Try, First_Try) VALUES (?, ?, ?, ?, ?)', [exam.studentId, lectureId, exam.firstTry, exam.secondTry, exam.thirdTry]).then((result) => {
+const addExam = async (exam, lectureId) => {
+    return connection.execute('INSERT INTO Exam (StudentID, LectureID, First_Try, Second_Try, Third_Try) VALUES (?, ?, ?, ?, ?)', [exam.studentId, lectureId, exam.firstTry, exam.secondTry, exam.thirdTry]).then((result) => {
         return result[0].insertId;
     }).catch((err) => {
         console.log(err);
