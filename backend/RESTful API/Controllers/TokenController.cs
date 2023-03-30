@@ -82,8 +82,9 @@ namespace RESTful_API.Controllers
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
         }
 
-        private async Task<string> Fetch(User user)
+        private async Task<Secretary> Fetch(User user)
         {
+            /*
             var admin = await _context.Admins.FirstOrDefaultAsync(a => a.UserID == user.UserID);
             var student = await _context.Students.FirstOrDefaultAsync(s => s.UserID == user.UserID);
             var sectary = await _context.Secretarys.FirstOrDefaultAsync(s => s.UserID == user.UserID);
@@ -105,7 +106,8 @@ namespace RESTful_API.Controllers
             {
                 return null;
             }
-            
+            */
+            return await _context.Secretarys.FirstOrDefaultAsync(s => s.UserID == user.UserID);
         }
     }
 }
