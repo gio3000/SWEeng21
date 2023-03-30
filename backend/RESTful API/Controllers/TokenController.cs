@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using RESTful_API.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace RESTful_API.Controllers
 {
@@ -53,9 +55,12 @@ namespace RESTful_API.Controllers
                         expires: DateTime.UtcNow.AddMinutes(10),
                         signingCredentials: signIn);
 
-                    
+                    var response = new[]
+                    {
+                        new {Token = new JwtSecurityTokenHandler().WriteToken(token), User = user}
+                    };
 
-                    return Ok(new JwtSecurityTokenHandler().WriteToken(token));
+                    return Ok(JsonConvert.SerializeObject(response));
                 }
                 else
                 {
