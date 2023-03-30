@@ -220,15 +220,26 @@ class LoginScreenState extends State<LoginScreen> {
     return null;
   }
 
+  ///validates the password text input field syntax
+  ///returns the [error message] if syntax is not correct
+  ///returns `null` if the syntax is correct
   String? validatePasswordInput(String? inputValue) {
     inputValue ??= '';
     if (inputValue.length > constants.cMaxInputLength) {
       return 'Zu viele Zeichen!';
     }
-    if (inputValue.length < 4) {
+    if (inputValue.length < 6) {
       return 'Zu wenige Zeichen!';
     }
-    //TODO check for capital letters, numbers and special characters
+    if (!inputValue.contains(RegExp(r"[A-Z]"))) {
+      return 'Mindestens ein Großbuchstabe soll enthalten sein';
+    }
+    if (!inputValue.contains(RegExp(r"[a-z]"))) {
+      return 'Mindestens ein Kleinbuchstabe soll enthalten sein';
+    }
+    if (!inputValue.contains(RegExp(r"[0-9]"))) {
+      return 'Mindestens eine Zahl soll enthalten sein';
+    }
 
     return null;
   }

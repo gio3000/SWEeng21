@@ -7,7 +7,6 @@ import 'package:frontend/models/secretary_user.dart';
 import 'package:frontend/models/student_user.dart';
 import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/user.dart';
-import 'package:frontend/utils/authenticated_request.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,7 +20,8 @@ class AuthorizationProvider with ChangeNotifier {
   ///it sends `userName` and `password` to the Webserver. If these credentials
   ///are approved the server should send a token back otherwise null is stored in
   ///`authenticationToken`
-  ///TODO delete userRole in params
+  ///TODO delete userRole in params, when backend is able to return a user after
+  ///correct authorization
   Future<void> authorize(String email, String password, UserRole role) async {
     Map<String, String> authorizationData = {
       "email": email,

@@ -3,7 +3,10 @@ import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/user.dart';
 
 class Student extends User {
-  final List<GradeSubjectMapper> grades = [];
+  final List<GradeSubjectMapper> dummyGrades = [];
+
+  //TODO set id when backend works
+  int studentId = -1;
 
   Student({
     required String id,

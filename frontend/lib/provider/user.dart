@@ -29,7 +29,6 @@ class User with ChangeNotifier {
   }
 
   static User fromMap(Map<String, Object?> map) {
-    //TODO
     return User(
         id: map[constants.userIdKey] as String? ?? '',
         firstName: map[constants.userFirstNameKey] as String? ?? '',

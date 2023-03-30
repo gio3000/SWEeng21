@@ -11,7 +11,7 @@ void main() {
       Tuple2<String, String?> input2 =
           const Tuple2('test-it21@it.dhbw-ravensburg.de', null);
       Tuple2<String, String?> input3 = const Tuple2(
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
           'Zu viele Zeichen!');
       expect(state.validateUsernameInput(input1.item1), input1.item2);
       expect(state.validateUsernameInput(input2.item1), input2.item2);
@@ -20,9 +20,9 @@ void main() {
     test('validate password input', () {
       Tuple2<String, String?> input1 = const Tuple2('', 'Zu wenige Zeichen!');
       Tuple2<String, String?> input2 =
-          const Tuple2('abcdef', 'Zu wenige Zeichen!');
+          const Tuple2('abcdf', 'Zu wenige Zeichen!');
       Tuple2<String, String?> input3 = const Tuple2(
-          'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+          'Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1',
           'Zu viele Zeichen!');
       Tuple2<String, String?> input4 = const Tuple2('MeinPasswort123!', null);
       expect(state.validatePasswordInput(input1.item1), input1.item2);

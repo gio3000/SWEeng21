@@ -29,6 +29,7 @@ class _SecretarySingleCourseStudentsScreenState
 
   @override
   Widget build(BuildContext context) {
+    var _ = (Provider.of<User>(context) as Secretary);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () => createStudent(),

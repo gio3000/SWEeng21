@@ -3,7 +3,18 @@ import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/user.dart';
 
 class Secretary extends User {
-  List<String> courses = ['TIT21', 'TEM22', 'TEK25'];
+  List<String> dummyCourses = ['TIT21', 'TEM22', 'TEK25'];
+  List<String> dummyStudents = [
+    '123456789',
+    '98456789',
+    '23456780',
+    '18392841',
+    '22020202'
+  ];
+
+  //TODO needs to be set if backend works
+  int secretaryId = -1;
+
   final List<String> lecturers = [];
 
   Secretary({
@@ -20,25 +31,30 @@ class Secretary extends User {
             email: email);
 
   Future<List<String>> getCourses() async {
-    // await AuthHttp.get('TODO');
-    return courses;
+    return dummyCourses;
   }
 
+  //TODO add backend connection url
   Future<List<String>> getStudentsFor(String courseName) async {
-    return ['123456789', '12456789', '2345678', '345', '22'];
+    return dummyStudents;
   }
 
+  //TODO add backend connection url
   Future<void> removeStudentFromCourse(
       {required String studentName, required String courseName}) async {
-    //TODO AuthHttp
+    dummyStudents.removeWhere(
+      (element) => studentName == element,
+    );
     notifyListeners();
   }
 
-  void addStudentToCourse(String studentName, String courseName) async {
-    //TODO AuthHttp
+  //TODO add backend connection url
+  void addStudentToCourse(String matrikelNr, String courseName) async {
+    dummyStudents.add(matrikelNr);
     notifyListeners();
   }
 
+  //TODO add backend connection
   void createStudent({
     required String firstName,
     required String lastName,
@@ -46,38 +62,39 @@ class Secretary extends User {
     required String location,
     required String matrikelNr,
   }) async {
-    //TODO AuthHttp.post();
+    addStudentToCourse(matrikelNr, '');
   }
 
+  //TODO add backend connection
   Future<void> addCourse({required String courseTitle}) async {
-    // await AuthHttp.post('TODO');
-    courses.add(courseTitle);
+    dummyCourses.add(courseTitle);
     notifyListeners();
   }
 
+  //TODO add backend connection
   Future<void> removeCourse({required String courseTitle}) async {
-    // await AuthHttp.post('TODO');
-    courses.removeWhere((element) => element == courseTitle);
+    dummyCourses.removeWhere((element) => element == courseTitle);
     notifyListeners();
   }
 
+  //TODO add backend connection
   Future<List<String>> getLecturers() async {
-    // await AuthHttp.post('TODO');
     return lecturers;
   }
 
+  //TODO add backend connection
   Future<void> addLecturer({required String lecturerName}) async {
-    // await AuthHttp.post('TODO');
     lecturers.add(lecturerName);
     notifyListeners();
   }
 
+  //TODO add backend connection
   Future<void> removeLecturer({required String lecturerName}) async {
-    // await AuthHttp.post('TODO');
     lecturers.removeWhere((element) => element == lecturerName);
     notifyListeners();
   }
 
+  //TODO add backend connection
   Future<List<GradeSubjectMapper>> getAllModules() async {
     return [
       GradeSubjectMapper(
@@ -104,7 +121,11 @@ class Secretary extends User {
     ];
   }
 
-  Future<void> insertGrade() async {}
+  //TODO add backend connection
+  Future<void> insertGrade(
+      String studentName, GradeSubjectMapper newGradeMapper) async {}
 
-  Future<void> removeGrade() async {}
+  //TODO add backend connection
+  Future<void> removeGrade(
+      String studentName, GradeSubjectMapper toRemoveGradeData) async {}
 }
