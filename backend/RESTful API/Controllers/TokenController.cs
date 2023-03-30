@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Razor.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using RESTful_API.Interface;
 using RESTful_API.Models;
 using RESTful_API.Repository;
 using System.IdentityModel.Tokens.Jwt;
@@ -60,7 +61,7 @@ namespace RESTful_API.Controllers
 
                     var response = new[]
                     {
-                                new {Token = new JwtSecurityTokenHandler().WriteToken(token), User = user, Info = Fetch(user)}
+                        new {Token = new JwtSecurityTokenHandler().WriteToken(token), User = user, Info = await Fetch(user)}
                     };
 
                     return Ok(JsonConvert.SerializeObject(response));
@@ -81,16 +82,30 @@ namespace RESTful_API.Controllers
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
         }
 
-        private async Task<Admin>Fetch(User user)
+        private async Task<string> Fetch(User user)
         {
-            switch (user.Role)
-            {
-                case 0:
-                    return await _context.Admins.Include(a => a.User).FirstOrDefaultAsync(a => a.UserID == user.UserID);
-                    
-            }
+            var admin = await _context.Admins.Include(a => a.User).FirstOrDefaultAsync(a => a.UserID == user.UserID);
+            var student = await _context.Students.Include(s => s.User).Include(s => s.Course).FirstOrDefaultAsync(s => s.UserID == user.UserID);
+            var sectary = await _context.Secretarys.Include(s => s.User).FirstOrDefaultAsync(s => s.UserID == user.UserID);
+            var lecturer = await _context.Lecturers.Include(l => l.User).FirstOrDefaultAsync(l => l.UserID == user.UserID);
 
-            return null;
+            if (admin != null)
+            {
+                return JsonConvert.SerializeObject(admin);
+            } else if (student != null)
+            {
+                return JsonConvert.SerializeObject(student);
+            } else if (sectary != null)
+            {
+                return JsonConvert.SerializeObject(sectary);
+            } else if (lecturer != null)
+            {
+                return JsonConvert.SerializeObject(lecturer);
+            } else
+            {
+                return null;
+            }
+            
         }
     }
 }
