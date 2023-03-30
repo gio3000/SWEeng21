@@ -5,6 +5,7 @@ import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:mysql1/mysql1.dart';
 import '../utils/authenticated_request.dart';
+import '../utils/constants.dart' as c;
 
 class Admin extends User {
   List<String> _secretariesNames = [
@@ -86,7 +87,8 @@ class Admin extends User {
         db: 'SWENGDB');
     var conn = await MySqlConnection.connect(settings);
     await conn.query(
-        'update User set Password=Initial_Password where userID=?', [userID]);
+        'update ${c.userTableName} set ${c.userPasswordKey}=Initial_Password where ${c.userIdKey}=?',
+        [userID]);
     conn.close();
   }
 
