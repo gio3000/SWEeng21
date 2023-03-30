@@ -61,7 +61,7 @@ namespace RESTful_API.Controllers
 
                     var response = new[]
                     {
-                        new {Token = new JwtSecurityTokenHandler().WriteToken(token), User = user, Info = await Fetch(user)}
+                        new {Token = new JwtSecurityTokenHandler().WriteToken(token), User = user}
                     };
 
                     return Ok(JsonConvert.SerializeObject(response));
@@ -80,40 +80,6 @@ namespace RESTful_API.Controllers
         private async Task<User> UserLogin(string email, string password)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
-        }
-
-        private async Task<string> Fetch(User user)
-        {
-            
-            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.UserID == user.UserID);
-            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserID == user.UserID);
-            var sectary = await _context.Secretarys.FirstOrDefaultAsync(s => s.UserID == user.UserID);
-            var lecturer = await _context.Lecturers.FirstOrDefaultAsync(l => l.UserID == user.UserID);
-
-            if (admin != null)
-            {
-                return JsonConvert.SerializeObject(admin, new JsonSerializerSettings() {
-                                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                });
-            } else if (student != null)
-            {
-                return JsonConvert.SerializeObject(student, new JsonSerializerSettings()
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                });
-            } else if (sectary != null)
-            {
-                return JsonConvert.SerializeObject(sectary, new JsonSerializerSettings()
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                });
-            } else if (lecturer != null)
-            {
-                return JsonConvert.SerializeObject(lecturer, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-            } else
-            {
-                return null;
-            }
         }
     }
 }
