@@ -82,9 +82,9 @@ namespace RESTful_API.Controllers
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
         }
 
-        private async Task<Secretary> Fetch(User user)
+        private async Task<string> Fetch(User user)
         {
-            /*
+            
             var admin = await _context.Admins.FirstOrDefaultAsync(a => a.UserID == user.UserID);
             var student = await _context.Students.FirstOrDefaultAsync(s => s.UserID == user.UserID);
             var sectary = await _context.Secretarys.FirstOrDefaultAsync(s => s.UserID == user.UserID);
@@ -92,22 +92,28 @@ namespace RESTful_API.Controllers
 
             if (admin != null)
             {
-                return JsonConvert.SerializeObject(admin);
+                return JsonConvert.SerializeObject(admin, new JsonSerializerSettings() {
+                                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
             } else if (student != null)
             {
-                return JsonConvert.SerializeObject(student);
+                return JsonConvert.SerializeObject(student, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
             } else if (sectary != null)
             {
-                return JsonConvert.SerializeObject(sectary);
+                return JsonConvert.SerializeObject(sectary, new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
             } else if (lecturer != null)
             {
-                return JsonConvert.SerializeObject(lecturer);
+                return JsonConvert.SerializeObject(lecturer, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
             } else
             {
                 return null;
             }
-            */
-            return await _context.Secretarys.FirstOrDefaultAsync(s => s.UserID == user.UserID);
         }
     }
 }
