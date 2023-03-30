@@ -84,10 +84,10 @@ namespace RESTful_API.Controllers
 
         private async Task<string> Fetch(User user)
         {
-            var admin = await _context.Admins.Include(a => a.User).FirstOrDefaultAsync(a => a.UserID == user.UserID);
-            var student = await _context.Students.Include(s => s.User).Include(s => s.Course).FirstOrDefaultAsync(s => s.UserID == user.UserID);
-            var sectary = await _context.Secretarys.Include(s => s.User).FirstOrDefaultAsync(s => s.UserID == user.UserID);
-            var lecturer = await _context.Lecturers.Include(l => l.User).FirstOrDefaultAsync(l => l.UserID == user.UserID);
+            var admin = await _context.Admins.FirstOrDefaultAsync(a => a.UserID == user.UserID);
+            var student = await _context.Students.FirstOrDefaultAsync(s => s.UserID == user.UserID);
+            var sectary = await _context.Secretarys.FirstOrDefaultAsync(s => s.UserID == user.UserID);
+            var lecturer = await _context.Lecturers.FirstOrDefaultAsync(l => l.UserID == user.UserID);
 
             if (admin != null)
             {
