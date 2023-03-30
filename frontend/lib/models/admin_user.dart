@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:frontend/models/secretary_user.dart';
 import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/user.dart';
 import '../utils/authenticated_request.dart';
@@ -77,19 +76,19 @@ class Admin extends User {
   void changeSecretaryName(
       {required String oldName, required String newName}) async {
     int index = _secretariesNames.indexOf(oldName);
+    _secretaries[index]["name"] = newName;
+    debugPrint(_secretaries[index].toString());
     debugPrint(index.toString());
   }
 
   void deleteSecretary({required String name}) async {
     int index = _secretariesNames.indexOf(name);
     _secretariesNames.removeAt(index);
-    int id = int.parse(_secretaries[index].id);
+    int id = _secretaries[index]["secretaryID"];
     _secretaries.removeAt(index);
-    debugPrint(_secretariesNames.toString());
     debugPrint(_secretaries.toString());
-    var response = await AuthHttp.delete(
-        "http://homenetwork-test.ddns.net:5160/api/secretary/?id=$id");
-    debugPrint(response.statusCode.toString());
+   var response = await AuthHttp.delete(
+       "http://homenetwork-test.ddns.net:5160/api/secretary/$id");
     notifyListeners();
   }
 }
