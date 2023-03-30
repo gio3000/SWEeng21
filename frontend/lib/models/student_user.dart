@@ -9,7 +9,7 @@ class Student extends User {
   int studentId = -1;
 
   Student({
-    required String id,
+    required int id,
     required String firstName,
     required String lastName,
     required UserRole role,

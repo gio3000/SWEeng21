@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/user_role.dart';
 import '../utils/constants.dart' as constants;
+import '../utils/db_constants.dart' as db;
 
 class User with ChangeNotifier {
-  final String id;
+  final int id;
   String firstName;
   String lastName;
   String email;
@@ -26,14 +27,5 @@ class User with ChangeNotifier {
     }
 
     ///TODO save newpwd in database
-  }
-
-  static User fromMap(Map<String, Object?> map) {
-    return User(
-        id: map[constants.userIdKey] as String? ?? '',
-        firstName: map[constants.userFirstNameKey] as String? ?? '',
-        lastName: map[constants.userLastNameKey] as String? ?? '',
-        role: map[constants.userRoleKey] as UserRole? ?? UserRole.invalid,
-        email: map[constants.userEmailKey] as String? ?? '');
   }
 }

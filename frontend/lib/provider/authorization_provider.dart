@@ -10,6 +10,7 @@ import 'package:frontend/provider/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils/db_constants.dart' as db;
 import '../utils/constants.dart' as constants;
 
 class AuthorizationProvider with ChangeNotifier {
@@ -20,9 +21,7 @@ class AuthorizationProvider with ChangeNotifier {
   ///it sends `userName` and `password` to the Webserver. If these credentials
   ///are approved the server should send a token back otherwise null is stored in
   ///`authenticationToken`
-  ///TODO delete userRole in params, when backend is able to return a user after
-  ///correct authorization
-  Future<void> authorize(String email, String password, UserRole role) async {
+  Future<void> authorize(String email, String password) async {
     Map<String, String> authorizationData = {
       "email": email,
       "password": password,
@@ -40,35 +39,47 @@ class AuthorizationProvider with ChangeNotifier {
     if (response.statusCode >= 400) {
       throw AuthorizationException();
     } else {
-      authorizationToken = response.body;
+      final List<dynamic> parsedResponse = json.decode(response.body);
+      if (parsedResponse.isEmpty) throw AuthorizationException();
+
+      //save token in cookie
+      authorizationToken = parsedResponse[0][db.tokenKey] as String?;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString(
           constants.authTokenSharedPrefKey, authorizationToken ?? '');
+
+      //fetch user data
+      final userData =
+          parsedResponse[0][db.userTableName] as Map<String, Object?>?;
+      if (userData == null) throw AuthorizationException();
+      UserRole role = UserRole.values[userData[db.userRoleKey] as int];
+
+      //set authorizedUser
       switch (role) {
         case UserRole.student:
           authorizedUser = Student(
-            email: 'test@test.com',
-            firstName: 'test',
-            lastName: 'test',
-            id: 'test',
+            email: userData[db.userEmailKey] as String? ?? '',
+            firstName: userData[db.userFirstNameKey] as String? ?? '',
+            lastName: userData[db.userLastNameKey] as String? ?? '',
+            id: userData[db.userIdKey] as int? ?? 0,
             role: role,
           );
           break;
         case UserRole.secretary:
           authorizedUser = Secretary(
-            email: 'test@test.com',
-            firstName: 'test',
-            lastName: 'test',
-            id: 'test',
+            email: userData[db.userEmailKey] as String? ?? '',
+            firstName: userData[db.userFirstNameKey] as String? ?? '',
+            lastName: userData[db.userLastNameKey] as String? ?? '',
+            id: userData[db.userIdKey] as int? ?? 0,
             role: role,
           );
           break;
         case UserRole.admin:
           authorizedUser = Admin(
-            email: 'test@test.com',
-            firstName: 'test',
-            lastName: 'test',
-            id: 'test',
+            email: userData[db.userEmailKey] as String? ?? '',
+            firstName: userData[db.userFirstNameKey] as String? ?? '',
+            lastName: userData[db.userLastNameKey] as String? ?? '',
+            id: userData[db.userIdKey] as int? ?? 0,
             role: role,
           );
           break;

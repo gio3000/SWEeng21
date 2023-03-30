@@ -15,7 +15,7 @@ import 'screens/login_screen.dart';
 
 void main() {
   final user = User(
-      id: '', firstName: '', lastName: '', role: UserRole.student, email: '');
+      id: 0, firstName: '', lastName: '', role: UserRole.student, email: '');
   runApp(
     MultiProvider(
       providers: [

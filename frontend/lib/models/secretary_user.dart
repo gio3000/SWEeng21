@@ -18,7 +18,7 @@ class Secretary extends User {
   final List<String> lecturers = [];
 
   Secretary({
-    required String id,
+    required int id,
     required String firstName,
     required String lastName,
     required UserRole role,

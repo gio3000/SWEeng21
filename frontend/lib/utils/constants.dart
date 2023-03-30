@@ -2,15 +2,6 @@ import 'package:flutter/material.dart';
 
 ///in here all global used Constants are stored
 
-//Database
-const userTableName = 'User';
-const userIdKey = 'UserID';
-const userFirstNameKey = 'First_Name';
-const userLastNameKey = 'Last_Name';
-const userRoleKey = 'Role';
-const userEmailKey = 'Email';
-const userPasswordKey = 'Password';
-
 //Shared Preferences
 const String authTokenSharedPrefKey = '/authorization-token';
 

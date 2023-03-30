@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/authorization_provider.dart';
+import 'package:frontend/provider/user.dart';
 import 'package:frontend/screens/admin_screen.dart';
 import 'package:frontend/screens/secretary_home_screen.dart';
 import 'package:frontend/screens/student_screen.dart';
@@ -24,7 +25,6 @@ class LoginScreenState extends State<LoginScreen> {
   bool _isTryingToLogin = false; //true if loading
   bool _isLoginSuccessful = false;
   int tryLoginCount = 0;
-  String loginRoute = StudentScreen.routeName;
 
   String email = '';
   String password = '';
@@ -120,29 +120,6 @@ class LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
-                      //TODO delete: just for testing purposes
-                      DropdownButton(
-                        value: loginRoute,
-                        items: const [
-                          DropdownMenuItem(
-                            value: StudentScreen.routeName,
-                            child: Text('Student'),
-                          ),
-                          DropdownMenuItem(
-                            value: SecretaryHomeScreen.routeName,
-                            child: Text('Sekretariat'),
-                          ),
-                          DropdownMenuItem(
-                            value: TechnicalAdministratorScreen.routeName,
-                            child: Text('Technischer Admin'),
-                          )
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            loginRoute = value!;
-                          });
-                        },
-                      )
                     ],
                   ),
                 ),
@@ -160,28 +137,12 @@ class LoginScreenState extends State<LoginScreen> {
   void _submitData() async {
     //check if inputs are invalid
     if (!_formKey.currentState!.validate()) return;
-
     _formKey.currentState!.save();
     setState(() => _isTryingToLogin = true);
 
-    UserRole role;
-    switch (loginRoute) {
-      case SecretaryHomeScreen.routeName:
-        role = UserRole.secretary;
-        break;
-      case StudentScreen.routeName:
-        role = UserRole.student;
-        break;
-      case TechnicalAdministratorScreen.routeName:
-        role = UserRole.admin;
-        break;
-      default:
-        role = UserRole.invalid;
-        break;
-    }
-
+    //authorize user
     await Provider.of<AuthorizationProvider>(context, listen: false)
-        .authorize(email, password, role)
+        .authorize(email, password)
         .then(
           (_) => setState(
             () {
@@ -199,8 +160,28 @@ class LoginScreenState extends State<LoginScreen> {
     });
     if (!mounted) return;
     if (_isLoginSuccessful == false) return;
-    Navigator.of(context)
-        .pushReplacementNamed(loginRoute, arguments: 'Test lool');
+
+    //fetch login route
+    String loginRoute = '';
+    switch (Provider.of<User>(context, listen: false).role) {
+      case UserRole.invalid:
+        return;
+      case UserRole.student:
+        loginRoute = StudentScreen.routeName;
+        break;
+      case UserRole.secretary:
+        loginRoute = SecretaryHomeScreen.routeName;
+        break;
+      case UserRole.lecturer:
+        // optional: Handle this case.
+        break;
+      case UserRole.admin:
+        loginRoute = TechnicalAdministratorScreen.routeName;
+        break;
+    }
+
+    //Move to loginRoute
+    Navigator.of(context).pushReplacementNamed(loginRoute);
   }
 
   ///validates the username text input field syntax

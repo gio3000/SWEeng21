@@ -5,7 +5,7 @@ import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/user.dart';
 import 'package:mysql1/mysql1.dart';
 import '../utils/authenticated_request.dart';
-import '../utils/constants.dart' as c;
+import '../utils/db_constants.dart' as db;
 
 class Admin extends User {
   List<String> _secretariesNames = [
@@ -14,7 +14,7 @@ class Admin extends User {
   bool isReady = false;
   List<dynamic> _secretaries = [];
   Admin({
-    required String id,
+    required int id,
     required String firstName,
     required String lastName,
     required UserRole role,
@@ -87,7 +87,7 @@ class Admin extends User {
         db: 'SWENGDB');
     var conn = await MySqlConnection.connect(settings);
     await conn.query(
-        'update ${c.userTableName} set ${c.userPasswordKey}=Initial_Password where ${c.userIdKey}=?',
+        'update ${db.userTableName} set ${db.userPasswordKey}=Initial_Password where ${db.userIdKey}=?',
         [userID]);
     conn.close();
   }

@@ -1,7 +1,7 @@
 enum UserRole {
-  invalid,
+  admin,
   student,
   secretary,
   lecturer,
-  admin,
+  invalid,
 }
