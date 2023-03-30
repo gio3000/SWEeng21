@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/user.dart';
+import 'package:mysql1/mysql1.dart';
 import '../utils/authenticated_request.dart';
 
 class Admin extends User {
@@ -58,7 +59,7 @@ class Admin extends User {
         "initial_Salt": "initial_Salt",
         "hash_Count": 5,
         "last_Name": "last_Name",
-        "initial_Password": "initial_Password",
+        "initial_Password": password,
         "email": email
       }
     };
@@ -70,7 +71,23 @@ class Admin extends User {
   }
 
   void resetSecretaryPassword({required String name}) async {
-    //TODO
+    int index = 0;
+    for (int i = 0; i < _secretaries.length; i++) {
+      if (_secretaries[i]["name"] == name) {
+        index = i;
+      }
+    }
+    int userID = _secretaries[index]["userID"];
+    var settings = ConnectionSettings(
+        host: '31.47.240.136',
+        port: 3307,
+        user: 'SWENGUser',
+        password: 'WkvUqQ2@DpCn',
+        db: 'SWENGDB');
+    var conn = await MySqlConnection.connect(settings);
+    await conn.query(
+        'update User set Password=Initial_Password where userID=?', [userID]);
+    conn.close();
   }
 
   void changeSecretaryName(
@@ -87,8 +104,8 @@ class Admin extends User {
     int id = _secretaries[index]["secretaryID"];
     _secretaries.removeAt(index);
     debugPrint(_secretaries.toString());
-   var response = await AuthHttp.delete(
-       "http://homenetwork-test.ddns.net:5160/api/secretary/$id");
+    var response = await AuthHttp.delete(
+        "http://homenetwork-test.ddns.net:5160/api/secretary/$id");
     notifyListeners();
   }
 }
