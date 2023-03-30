@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:frontend/models/secretary_user.dart';
 import 'package:frontend/models/user_role.dart';
 import 'package:frontend/provider/user.dart';
+import 'package:mysql1/mysql1.dart';
 import '../utils/authenticated_request.dart';
 
 class Admin extends User {
@@ -59,7 +59,7 @@ class Admin extends User {
         "initial_Salt": "initial_Salt",
         "hash_Count": 5,
         "last_Name": "last_Name",
-        "initial_Password": "initial_Password",
+        "initial_Password": password,
         "email": email
       }
     };
@@ -71,25 +71,41 @@ class Admin extends User {
   }
 
   void resetSecretaryPassword({required String name}) async {
-    //TODO
+    int index = 0;
+    for (int i = 0; i < _secretaries.length; i++) {
+      if (_secretaries[i]["name"] == name) {
+        index = i;
+      }
+    }
+    int userID = _secretaries[index]["userID"];
+    var settings = ConnectionSettings(
+        host: '31.47.240.136',
+        port: 3307,
+        user: 'SWENGUser',
+        password: 'WkvUqQ2@DpCn',
+        db: 'SWENGDB');
+    var conn = await MySqlConnection.connect(settings);
+    await conn.query(
+        'update User set Password=Initial_Password where userID=?', [userID]);
+    conn.close();
   }
 
   void changeSecretaryName(
       {required String oldName, required String newName}) async {
     int index = _secretariesNames.indexOf(oldName);
+    _secretaries[index]["name"] = newName;
+    debugPrint(_secretaries[index].toString());
     debugPrint(index.toString());
   }
 
   void deleteSecretary({required String name}) async {
     int index = _secretariesNames.indexOf(name);
     _secretariesNames.removeAt(index);
-    int id = int.parse(_secretaries[index].id);
+    int id = _secretaries[index]["secretaryID"];
     _secretaries.removeAt(index);
-    debugPrint(_secretariesNames.toString());
     debugPrint(_secretaries.toString());
     var response = await AuthHttp.delete(
-        "http://homenetwork-test.ddns.net:5160/api/secretary/?id=$id");
-    debugPrint(response.statusCode.toString());
+        "http://homenetwork-test.ddns.net:5160/api/secretary/$id");
     notifyListeners();
   }
 }
