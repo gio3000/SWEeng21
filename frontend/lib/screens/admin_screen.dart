@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/provider/authorization_provider.dart';
+import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/utils/authenticated_request.dart';
 import 'package:provider/provider.dart';
 import '../models/admin_user.dart';
@@ -11,7 +13,6 @@ import '../widgets/change_password.dart';
 
 class TechnicalAdministratorScreen extends StatefulWidget {
   static const routeName = '/technical-admin';
-
   const TechnicalAdministratorScreen({super.key});
   @override
   State<TechnicalAdministratorScreen> createState() =>
@@ -98,9 +99,9 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   }
 
   /// add New Seccretariat to List
-  void addSecretariat(String name, String password) {
+  void addSecretariat(String name, String password, String email) {
     (Provider.of<User>(context, listen: false) as Admin)
-        .addSecretary(name: name, password: password);
+        .addSecretary(name: name, password: password, email: email);
   }
 
   ///saves index and new name to Map so it can be saved to database from Map
@@ -122,21 +123,46 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
         .resetSecretaryPassword(name: secretariatsNames[index]);
   }
 
+  static const _logoutValue = 'logout';
+  static const _changePasswordValue = 'changePassword';
   @override
   Widget build(BuildContext context) {
     var _ = Provider.of<User>(context);
     return Scaffold(
         backgroundColor: constants.screenBackgroundColor,
         appBar: AppBar(
-          title: Text(
-              ModalRoute.of(context)?.settings.arguments as String? ?? 'Admin'),
+          title: const Text('Dashboard - Admin'),
           actions: [
-            IconButton(
-                onPressed: () {
-                  callChangePasswordDialog();
-                },
-                tooltip: 'Passwort ändern',
-                icon: const Icon(Icons.more_vert))
+            PopupMenuButton(
+              onSelected: (value) {
+                if (value == _logoutValue) {
+                  Provider.of<AuthorizationProvider>(context, listen: false)
+                      .logout();
+                  Navigator.of(context)
+                      .pushReplacementNamed(LoginScreen.routeName);
+                  return;
+                }
+                if (value == _changePasswordValue) {
+                  showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => const ChangePassowrd());
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: _changePasswordValue,
+                  child: const Text('Passwort ändern'),
+                  onTap: () {
+                    //TODO
+                  },
+                ),
+                const PopupMenuItem(
+                  value: _logoutValue,
+                  child: Text('Abmelden'),
+                ),
+              ],
+            )
           ],
         ),
         body: Padding(
@@ -162,7 +188,6 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
                     index: index,
                     callAlert: callDeleteAlert,
                     name: secretariatsNames[index],
-                    addNewNameToMap: changeNameInList,
                     addChangedNameToList: changeNameInList,
                     resetPassword: resetPassword,
                   ),

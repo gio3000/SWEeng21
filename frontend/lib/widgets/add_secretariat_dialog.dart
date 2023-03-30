@@ -17,11 +17,13 @@ class AddSecretaryDialog extends StatefulWidget {
 class AddSecretaryDialogState extends State<AddSecretaryDialog> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   /// TODO add missing parameters to create full user
   ///calls necessary functions in admin_scrren to save information about new secreiat
   void saveNewSecretariat() {
-    widget.addSecretariat(_nameController.text, _passwordController.text);
+    widget.addSecretariat(
+        _nameController.text, _passwordController.text, _emailController.text);
   }
 
   @override
@@ -38,19 +40,21 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
             const Text('Sekretariat hinzufügen',
                 style: TextStyle(fontSize: 25)),
             TextField(
-              maxLength: 60,
-
-              ///TODO Namenslänge festlegen
+              maxLength: constants.cMaxInputLength,
               controller: _nameController,
               decoration: const InputDecoration(
                   hintText: 'Name des Sekretariats eingeben',
                   label: Text('Name')),
             ),
             TextField(
+                controller: _emailController,
+                maxLength: constants.cMaxInputLength,
+                decoration: const InputDecoration(
+                    hintText: 'Email-Adresse des Sekretariats eingeben',
+                    label: Text('Email-Adresse'))),
+            TextField(
                 controller: _passwordController,
-                maxLength: 60,
-
-                ///TODO PasswortLänge festelgene
+                maxLength: constants.cMaxInputLength,
                 decoration: const InputDecoration(
                     hintText: 'Initiales Passwort des Sekretariats eingeben',
                     label: Text('Passwort'))),

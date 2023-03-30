@@ -4,7 +4,6 @@ class AdminListTile extends StatefulWidget {
   final int index;
   final Function callAlert;
   final String name;
-  final Function addNewNameToMap;
   final Function addChangedNameToList;
   final Function resetPassword;
   const AdminListTile(
@@ -12,7 +11,6 @@ class AdminListTile extends StatefulWidget {
       required this.index,
       required this.callAlert,
       required this.name,
-      required this.addNewNameToMap,
       required this.addChangedNameToList,
       required this.resetPassword});
 
@@ -39,10 +37,10 @@ class _AdminListTileState extends State<AdminListTile> {
     });
   }
 
-  ///calls the addNewNameToMap-function from admin_screen
-  void addNameToMap(int index) {
-    widget.addNewNameToMap(index - 1, _nameController.text);
-  }
+  // ///calls the addNewNameToMap-function from admin_screen
+  // void addNameToMap(int index) {
+  //   widget.addNewNameToMap(index - 1, _nameController.text);
+  // }
 
   ///handles the state of the bool value of saveButtonEnabled
   void checkSaveButtonEnabled() {
@@ -89,7 +87,6 @@ class _AdminListTileState extends State<AdminListTile> {
                     onPressed: saveButtonEnabled
                         ? () {
                             changeTitle();
-                            addNameToMap(widget.index);
                             widget.addChangedNameToList(
                                 widget.index, _nameController.text);
                           }
