@@ -140,12 +140,14 @@ class LoginScreenState extends State<LoginScreen> {
     _formKey.currentState!.save();
     setState(() => _isTryingToLogin = true);
 
+    UserRole role = UserRole.invalid;
     //authorize user
     await Provider.of<AuthorizationProvider>(context, listen: false)
         .authorize(email, password)
         .then(
-          (_) => setState(
+          (newRole) => setState(
             () {
+              role = newRole;
               _isTryingToLogin = false;
               _isLoginSuccessful = true;
             },
@@ -163,7 +165,7 @@ class LoginScreenState extends State<LoginScreen> {
 
     //fetch login route
     String loginRoute = '';
-    switch (Provider.of<User>(context, listen: false).role) {
+    switch (role) {
       case UserRole.invalid:
         return;
       case UserRole.student:

@@ -21,7 +21,7 @@ class AuthorizationProvider with ChangeNotifier {
   ///it sends `userName` and `password` to the Webserver. If these credentials
   ///are approved the server should send a token back otherwise null is stored in
   ///`authenticationToken`
-  Future<void> authorize(String email, String password) async {
+  Future<UserRole> authorize(String email, String password) async {
     Map<String, String> authorizationData = {
       "email": email,
       "password": password,
@@ -87,10 +87,13 @@ class AuthorizationProvider with ChangeNotifier {
           throw AuthorizationException();
       }
       notifyListeners();
+      return role;
     }
   }
 
   void logout() {
     authorizationToken = null;
+    authorizedUser?.role = UserRole.invalid;
+    notifyListeners();
   }
 }
