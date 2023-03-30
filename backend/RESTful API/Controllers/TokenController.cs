@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using RESTful_API.Models;
+using RESTful_API.Repository;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -55,9 +57,10 @@ namespace RESTful_API.Controllers
                         expires: DateTime.UtcNow.AddMinutes(10),
                         signingCredentials: signIn);
 
+
                     var response = new[]
                     {
-                        new {Token = new JwtSecurityTokenHandler().WriteToken(token), User = user}
+                                new {Token = new JwtSecurityTokenHandler().WriteToken(token), User = user, Info = Fetch(user)}
                     };
 
                     return Ok(JsonConvert.SerializeObject(response));
@@ -76,6 +79,18 @@ namespace RESTful_API.Controllers
         private async Task<User> UserLogin(string email, string password)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+        }
+
+        private async Task<Admin>Fetch(User user)
+        {
+            switch (user.Role)
+            {
+                case 0:
+                    return await _context.Admins.Include(a => a.User).FirstOrDefaultAsync(a => a.UserID == user.UserID);
+                    
+            }
+
+            return null;
         }
     }
 }
