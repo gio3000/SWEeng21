@@ -15,6 +15,7 @@ class AddSecretaryDialog extends StatefulWidget {
 }
 
 class AddSecretaryDialogState extends State<AddSecretaryDialog> {
+  bool safeEnabled = false;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -60,6 +61,7 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
   void _submitData() async {
     //check if inputs are invalid
     if (!_formKey.currentState!.validate()) return;
+    safeEnabled = true;
     _formKey.currentState!.save();
   }
 
@@ -112,11 +114,13 @@ class AddSecretaryDialogState extends State<AddSecretaryDialog> {
                         child: const Text('Abbrechen')),
                     const Spacer(),
                     ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          saveNewSecretariat();
-                        },
-                        child: const Text('Speichern'))
+                        onPressed: safeEnabled
+                            ? () {
+                                Navigator.of(context).pop();
+                                saveNewSecretariat();
+                              }
+                            : null,
+                        child: const Text('Speichern')),
                   ],
                 )
               ],
