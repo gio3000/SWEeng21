@@ -47,7 +47,8 @@ class _StudentScreenState extends State<StudentScreen> {
     return LayoutBuilder(
       builder: (ctx, constraints) => Scaffold(
         appBar: AppBar(
-          title: const Text('Dashboard - Student'),
+          title: Text(
+              'Dashboard - ${(Provider.of<User>(context, listen: false) as Student).firstName}'),
           actions: [
             PopupMenuButton(
               onSelected: (value) {

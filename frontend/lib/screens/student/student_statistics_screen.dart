@@ -88,24 +88,23 @@ class _StudentStatisticsScreenState extends State<StudentStatisticsScreen> {
                                 child: CircularProgressIndicator.adaptive())
                             : SfCartesianChart(
                                 title: ChartTitle(text: 'Verlauf'),
-                                primaryXAxis: DateTimeAxis(),
+                                primaryXAxis: CategoryAxis(),
                                 series: [
-                                  LineSeries<GradeSubjectMapper, DateTime>(
-                                    dataLabelSettings: const DataLabelSettings(
-                                        isVisible: true),
-                                    xValueMapper:
-                                        (GradeSubjectMapper mapper, _) =>
-                                            mapper.examDate,
-                                    yValueMapper:
-                                        (GradeSubjectMapper mapper, _) =>
-                                            mapper.grade,
-                                    dataLabelMapper: (GradeSubjectMapper mapper,
-                                            _) =>
-                                        '${mapper.subjectName}: ${mapper.grade}',
-                                    dataSource: grades
-                                      ..sort((a, b) =>
-                                          a.examDate.compareTo(b.examDate)),
-                                  ),
+                                  LineSeries<GradeSubjectMapper, String>(
+                                      dataLabelSettings:
+                                          const DataLabelSettings(
+                                              isVisible: true),
+                                      xValueMapper:
+                                          (GradeSubjectMapper mapper, _) =>
+                                              mapper.subjectName,
+                                      yValueMapper:
+                                          (GradeSubjectMapper mapper, _) =>
+                                              mapper.grade,
+                                      dataLabelMapper: (GradeSubjectMapper
+                                                  mapper,
+                                              _) =>
+                                          '${mapper.subjectName}: ${mapper.grade}',
+                                      dataSource: grades),
                                 ],
                               ),
                       ),
@@ -143,9 +142,7 @@ class _StudentStatisticsScreenState extends State<StudentStatisticsScreen> {
                                       dataLabelMapper:
                                           (GradeSubjectMapper mapper, _) =>
                                               mapper.creditPoints.toString(),
-                                      dataSource: grades
-                                        ..sort((a, b) => a.creditPoints
-                                            .compareTo(b.creditPoints)),
+                                      dataSource: grades,
                                     ),
                                   ],
                                 ),
