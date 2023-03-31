@@ -10,6 +10,8 @@ using RESTful_API.Models;
 using RESTful_API.Repository;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -34,7 +36,7 @@ namespace RESTful_API.Controllers
         {
             if (_userData != null && _userData.Email != null && _userData.Password != null)
             {
-                var user = await UserLogin(_userData.Email, _userData.Password);
+                var user = await UserLogin(_userData.Email, _userData.Password, _userData);
 
                 if (user != null)
                 {
@@ -53,7 +55,7 @@ namespace RESTful_API.Controllers
                         _configuration["Jwt:Issuer"],
                         _configuration["Jwt:Audience"],
                         claims,
-                        expires: DateTime.UtcNow.AddMinutes(10),
+                        expires: DateTime.UtcNow.AddMinutes(60), 
                         signingCredentials: signIn);
 
 
@@ -75,9 +77,18 @@ namespace RESTful_API.Controllers
             }
         }
 
-        private async Task<User> UserLogin(string email, string password)
+        private async Task<User> UserLogin(string email, string password, User userData)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+            var user = await GetUser(email);
+            if (user != null) {
+                var hashToCompare = Rfc2898DeriveBytes.Pbkdf2(Encoding.ASCII.GetBytes(password), Encoding.ASCII.GetBytes(user.Salt), user.Hash_Count, HashAlgorithmName.SHA512, 32);
+                if (hashToCompare.SequenceEqual(Convert.FromHexString(user.Password)))
+                {
+                    return user;
+                }
+            }   
+
+            return null;
         }
 
         private int FetchID(int id, string role)
@@ -95,6 +106,12 @@ namespace RESTful_API.Controllers
                 default: return 0;
             }
             
+        }
+
+
+        private async Task<User> GetUser(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
     }
 }
