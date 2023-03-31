@@ -58,11 +58,7 @@ namespace RESTful_API.Repository
             try
             {
                 Lecturer? lecturer = _dbContext.Lecturers
-<<<<<<< Updated upstream
                     .Include(u => u.UserID)
-=======
-                    .Include(l => l.User)
->>>>>>> Stashed changes
                     .Single(l => l.LecturerID == id);
                 if (lecturer != null)
                 {
@@ -83,11 +79,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-<<<<<<< Updated upstream
                 return _dbContext.Lecturers.Include(u => u.UserID).ToList();
-=======
-                return _dbContext.Lecturers.Include(l => l.User).ToList();
->>>>>>> Stashed changes
             }
             catch
             {

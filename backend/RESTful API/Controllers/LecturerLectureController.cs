@@ -7,9 +7,5 @@ namespace RESTful_API.Controllers
     [ApiController]
     public class LecturerLectureController : ControllerBase
     {
-<<<<<<< Updated upstream
-=======
-        //TODO
->>>>>>> Stashed changes
     }
 }

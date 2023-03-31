@@ -57,11 +57,7 @@ namespace RESTful_API.Repository
         {
             try
             {
-<<<<<<< Updated upstream
                 return _dbContext.Secretarys.Include(u => u.UserID).ToList();
-=======
-                return _dbContext.Secretarys.Include(s => s.User).ToList();
->>>>>>> Stashed changes
             }
             catch
             {
@@ -74,11 +70,7 @@ namespace RESTful_API.Repository
             try
             {
                 Secretary? secretary= _dbContext.Secretarys
-<<<<<<< Updated upstream
                     .Include(u => u.UserID)
-=======
-                    .Include(s => s.User)
->>>>>>> Stashed changes
                     .Single(s => s.SecretaryID == id);
                 if (secretary != null)
                 {

@@ -14,11 +14,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-<<<<<<< Updated upstream
       "applicationUrl": "http://localhost:5160",
-=======
-      "applicationUrl": "http://*:5160",
->>>>>>> Stashed changes
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
