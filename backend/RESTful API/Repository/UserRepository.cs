@@ -52,10 +52,6 @@ namespace RESTful_API.Repository
         {
             try
             {
-                var hash = HashPasword(user.Password, out var salt, user.Hash_Count);
-                user.Password = hash;
-                user.Salt = Convert.ToHexString(salt);
-
                 _dbContext.Users.Add(user);
                 _dbContext.SaveChanges();
             }
@@ -69,11 +65,6 @@ namespace RESTful_API.Repository
         {
             try
             {
-                var hash = HashPasword(user.Password, out var salt, user.Hash_Count);
-                user.Password = hash;
-                user.Salt = Convert.ToHexString(salt);
-
-
                 _dbContext.Entry(user).State = EntityState.Modified;
                 _dbContext.SaveChanges();
             }

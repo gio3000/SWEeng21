@@ -79,22 +79,7 @@ namespace RESTful_API.Controllers
 
         private async Task<User> UserLogin(string email, string password, User userData)
         {
-            var user = await GetUser(email);
-            Console.WriteLine(user);
-            if (user != null) {
-                Console.WriteLine(user.Email);
-                Console.WriteLine(user.Password);
-                Console.WriteLine(user.Salt);
-                Console.WriteLine(user.Hash_Count);
-                var hashToCompare = Rfc2898DeriveBytes.Pbkdf2(Encoding.ASCII.GetBytes(password), Encoding.ASCII.GetBytes(user.Salt), user.Hash_Count, HashAlgorithmName.SHA512, 32);
-                Console.WriteLine(hashToCompare);
-                if (hashToCompare.SequenceEqual(Convert.FromHexString(user.Password)))
-                {
-                    return user;
-                }
-            }   
-
-            return null;
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
         }
 
         private int FetchID(int id, string role)
@@ -112,12 +97,6 @@ namespace RESTful_API.Controllers
                 default: return 0;
             }
             
-        }
-
-
-        private async Task<User> GetUser(string email)
-        {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
     }
 }
