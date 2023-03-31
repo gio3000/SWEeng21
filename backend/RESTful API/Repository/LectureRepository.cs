@@ -58,7 +58,11 @@ namespace RESTful_API.Repository
             try
             {
                 Lecture? lecture = _dbContext.Lectures
+<<<<<<< Updated upstream
                     .Include(m => m.ModuleID)
+=======
+                    .Include(l => l.Module)
+>>>>>>> Stashed changes
                     .Single(l => l.LectureID == id);
                 if (lecture != null)
                 {
@@ -80,7 +84,11 @@ namespace RESTful_API.Repository
             try
             {
                 return _dbContext.Lectures
+<<<<<<< Updated upstream
                     .Include(m => m.ModuleID)
+=======
+                    .Include(l => l.Module)
+>>>>>>> Stashed changes
                     .ToList();
             }
             catch

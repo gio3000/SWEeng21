@@ -58,7 +58,11 @@ namespace RESTful_API.Repository
         {
             try
             {
+<<<<<<< Updated upstream
                 Course? course = _dbContext.Courses.Single(a => a.CourseID == id);
+=======
+                Course? course = _dbContext.Courses.Include(c => c.Secretary).Single(a => a.CourseID == id);
+>>>>>>> Stashed changes
                 if (course != null)
                 {
                     return course;
@@ -78,7 +82,11 @@ namespace RESTful_API.Repository
         {
             try
             {
+<<<<<<< Updated upstream
                 return _dbContext.Courses.ToList();
+=======
+                return _dbContext.Courses.Include(c => c.Secretary).ToList();
+>>>>>>> Stashed changes
             }
             catch
             {

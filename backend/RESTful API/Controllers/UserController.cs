@@ -1,4 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+<<<<<<< Updated upstream
+=======
+using Microsoft.AspNetCore.Cors;
+>>>>>>> Stashed changes
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +11,10 @@ using RESTful_API.Models;
 
 namespace RESTful_API.Controllers
 {
+<<<<<<< Updated upstream
+=======
+    [EnableCors("MyPolicy")]
+>>>>>>> Stashed changes
     [Authorize]
     [Route("api/user")]
     [ApiController]
