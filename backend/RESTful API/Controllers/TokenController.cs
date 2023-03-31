@@ -44,8 +44,6 @@ namespace RESTful_API.Controllers
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim("UserID", user.UserID.ToString()),
-                        new Claim("First_Name", user.First_Name),
-                        new Claim("Last_Name", user.Last_Name),
                         new Claim("Email", user.Email)
                     };
 
