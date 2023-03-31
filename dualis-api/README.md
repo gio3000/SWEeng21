@@ -22,7 +22,7 @@ Send a POST request to the server on your Port (default 3000) with the following
             "lastname": "student lastname",
             "email": "student email",
             "password": "student password",
-            "matriculationnumber": "student matriculationnumber"
+            "matriculationNr": "student matriculationnumber"
         }
     ]
 }

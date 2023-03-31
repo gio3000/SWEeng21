@@ -3,8 +3,6 @@ import formatCourseData from './data-formater.js';
 import { Course, Student } from './classes.js';
 import { addCourse, addUser, getStudentId, updateStudent, addModule, addCourseModuleRel, addLecture, addExam } from './database.js';
 import { verifyToken } from './authentication.js';
-import util from 'util';
-import fs from 'fs';
 import express from 'express';
 import dotenv from 'dotenv';
 
@@ -19,7 +17,7 @@ const port = process.env.PORT || 3000;
  * Gets a course from Dualis and saves it to the database
  */
 app.post('/', verifyToken, async (req, res) => {
-    console.log('Request received');
+    console.log(`Request received at ${new Date().toLocaleString('de-DE')}`);
     const time1 = performance.now();
     if (!req.secretaryId) {
         return;
@@ -62,8 +60,6 @@ app.post('/', verifyToken, async (req, res) => {
     await insertCourse(course);
     const time4 = performance.now();
     console.log(`Time to insert course: ${time4 - time3}ms`);
-
-    fs.writeFileSync('course.json', JSON.stringify(course, null, 2));
 
     res.status(200).send('Hello World!');
     const time5 = performance.now();

@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const connection = await mysql.createConnection({
+const pool = mysql.createPool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     user: process.env.DB_USER,
@@ -18,7 +18,7 @@ const connection = await mysql.createConnection({
  * @returns User object or null
  */
 const getUser = async (email, userid) => {
-    return connection.execute('SELECT * FROM User WHERE Email = ? AND UserID = ?', [email, userid]).then(([user]) => {
+    return pool.execute('SELECT * FROM User WHERE Email = ? AND UserID = ?', [email, userid]).then(([user]) => {
         if (user.length !== 1) {
             return null;
         }
@@ -35,7 +35,7 @@ const getUser = async (email, userid) => {
  * @returns Secretary object or null
  */
 const getSecretary = async (userid) => {
-    return connection.execute('SELECT SecretaryID FROM Secretary WHERE UserID = ?', [userid]).then(([secretary]) => {
+    return pool.execute('SELECT SecretaryID FROM Secretary WHERE UserID = ?', [userid]).then(([secretary]) => {
         if (secretary.length !== 1) {
             return null;
         }
@@ -52,7 +52,7 @@ const getSecretary = async (userid) => {
  * @returns CourseID or null
  */
 const addCourse = async (course) => {
-    return connection.execute('INSERT INTO Course (Coursename, SecretaryID) VALUES (?, ?)', [course.courseName, course.secretaryId]).then((result) => {
+    return pool.execute('INSERT INTO Course (Coursename, SecretaryID) VALUES (?, ?)', [course.courseName, course.secretaryId]).then((result) => {
         return result[0].insertId;
     }).catch((err) => {
         console.log(err);
@@ -66,7 +66,7 @@ const addCourse = async (course) => {
  * @returns UserID or null
  */
 const addUser = async (user) => {
-    return connection.execute('INSERT INTO User (First_Name, Last_Name, Role, Email, Password, Salt, Hash_Count) VALUES (?, ?, ?, ?, ?, ?, ?)', [user.firstName, user.lastName, user.role, user.email, user.hash, user.salt, user.hashcount]).then((result) => {
+    return pool.execute('INSERT INTO User (First_Name, Last_Name, Role, Email, Password, Initial_Password, Salt, Initial_Salt, Hash_Count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [user.firstName, user.lastName, user.role, user.email, user.hash, user.hash, user.salt, user.salt, user.hashcount]).then((result) => {
         return result[0].insertId;
     }).catch((err) => {
         console.log(err);
@@ -80,7 +80,7 @@ const addUser = async (user) => {
  * @returns StudentID or null
  */
 const getStudentId = async (userId) => {
-    return connection.execute('SELECT StudentID FROM Student WHERE UserID = ?', [userId]).then(([student]) => {
+    return pool.execute('SELECT StudentID FROM Student WHERE UserID = ?', [userId]).then(([student]) => {
         if (student.length !== 1) {
             return null;
         }
@@ -98,7 +98,7 @@ const getStudentId = async (userId) => {
  * @returns true or null
  */
 const updateStudent = async (courseId, student) => {
-    return connection.execute('UPDATE Student SET CourseID = ?, MatriculationNr = ? WHERE UserID = ? AND StudentID = ?', [courseId, student.matriculationNumber, student.userId, student.studentId]).then((result) => {
+    return pool.execute('UPDATE Student SET CourseID = ?, MatriculationNr = ? WHERE UserID = ? AND StudentID = ?', [courseId, student.matriculationNumber, student.userId, student.studentId]).then((result) => {
         return (result[0].affectedRows === 1);
     }).catch((err) => {
         console.log(err);
@@ -112,7 +112,7 @@ const updateStudent = async (courseId, student) => {
  * @returns ModuleID or null
  */
 const addModule = async (module) => {
-    return connection.execute('INSERT INTO Module (Modulename, CTS) VALUES (?, ?)', [module.moduleName, module.cts]).then((result) => {
+    return pool.execute('INSERT INTO Module (Modulename, CTS) VALUES (?, ?)', [module.moduleName, module.cts]).then((result) => {
         return result[0].insertId;
     }).catch((err) => {
         console.log(err);
@@ -127,7 +127,7 @@ const addModule = async (module) => {
  * @returns true or null
  */
 const addCourseModuleRel = async (courseId, moduleId) => {
-    return connection.execute('INSERT INTO CourseModuleRel (CourseID, ModuleID) VALUES (?, ?)', [courseId, moduleId]).then((result) => {
+    return pool.execute('INSERT INTO CourseModuleRel (CourseID, ModuleID) VALUES (?, ?)', [courseId, moduleId]).then((result) => {
         return result[0].insertId;
     }).catch((err) => {
         console.log(err);
@@ -142,7 +142,7 @@ const addCourseModuleRel = async (courseId, moduleId) => {
  * @returns LectureID or null
  */
 const addLecture = async (moduleId, lecture) => {
-    return connection.execute('INSERT INTO Lecture (ModuleID, Lecturename, CountsToAverage, Semester) VALUES (?, ?, ?, ?)', [moduleId, lecture.lectureName, lecture.countsToAverage, lecture.semester]).then((result) => {
+    return pool.execute('INSERT INTO Lecture (ModuleID, Lecturename, CountsToAverage, Semester) VALUES (?, ?, ?, ?)', [moduleId, lecture.lectureName, lecture.countsToAverage, lecture.semester]).then((result) => {
         return result[0].insertId;
     }).catch((err) => {
         console.log(err);
@@ -157,7 +157,7 @@ const addLecture = async (moduleId, lecture) => {
  * @returns ExamID or null
  */
 const addExam = async (exam, lectureId) => {
-    return connection.execute('INSERT INTO Exam (StudentID, LectureID, First_Try, Second_Try, Third_Try) VALUES (?, ?, ?, ?, ?)', [exam.studentId, lectureId, exam.firstTry, exam.secondTry, exam.thirdTry]).then((result) => {
+    return pool.execute('INSERT INTO Exam (StudentID, LectureID, First_Try, Second_Try, Third_Try) VALUES (?, ?, ?, ?, ?)', [exam.studentId, lectureId, exam.firstTry, exam.secondTry, exam.thirdTry]).then((result) => {
         return result[0].insertId;
     }).catch((err) => {
         console.log(err);
