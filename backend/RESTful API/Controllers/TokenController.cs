@@ -82,7 +82,10 @@ namespace RESTful_API.Controllers
             var user = await GetUser(email);
             Console.WriteLine(user);
             if (user != null) {
-                Console.WriteLine(user);
+                Console.WriteLine(user.Email);
+                Console.WriteLine(user.Password);
+                Console.WriteLine(user.Salt);
+                Console.WriteLine(user.Hash_Count);
                 var hashToCompare = Rfc2898DeriveBytes.Pbkdf2(Encoding.ASCII.GetBytes(password), Encoding.ASCII.GetBytes(user.Salt), user.Hash_Count, HashAlgorithmName.SHA512, 32);
                 if (hashToCompare.SequenceEqual(Convert.FromHexString(user.Password)))
                 {
