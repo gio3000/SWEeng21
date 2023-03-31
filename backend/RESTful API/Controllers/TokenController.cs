@@ -80,7 +80,9 @@ namespace RESTful_API.Controllers
         private async Task<User> UserLogin(string email, string password, User userData)
         {
             var user = await GetUser(email);
+            Console.WriteLine(user);
             if (user != null) {
+                Console.WriteLine(user);
                 var hashToCompare = Rfc2898DeriveBytes.Pbkdf2(Encoding.ASCII.GetBytes(password), Encoding.ASCII.GetBytes(user.Salt), user.Hash_Count, HashAlgorithmName.SHA512, 32);
                 if (hashToCompare.SequenceEqual(Convert.FromHexString(user.Password)))
                 {

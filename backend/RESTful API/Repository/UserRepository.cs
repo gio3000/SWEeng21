@@ -52,10 +52,9 @@ namespace RESTful_API.Repository
         {
             try
             {
-                var hash = HashPasword(user.Password, out var salt);
+                var hash = HashPasword(user.Password, out var salt, user.Hash_Count);
                 user.Password = hash;
                 user.Salt = Convert.ToHexString(salt);
-                user.Hash_Count = 35000;
 
                 _dbContext.Users.Add(user);
                 _dbContext.SaveChanges();
@@ -70,10 +69,9 @@ namespace RESTful_API.Repository
         {
             try
             {
-                var hash = HashPasword(user.Password, out var salt);
+                var hash = HashPasword(user.Password, out var salt, user.Hash_Count);
                 user.Password = hash;
                 user.Salt = Convert.ToHexString(salt);
-                user.Hash_Count = 35000;
 
 
                 _dbContext.Entry(user).State = EntityState.Modified;
@@ -113,7 +111,7 @@ namespace RESTful_API.Repository
             return _dbContext.Users.Any(e => e.UserID == id);
         }
 
-        public string HashPasword(string password, out byte[] salt)
+        public string HashPasword(string password, out byte[] salt, int count)
         {
             const int keySize = 32;
             const int iterations = 350000;
@@ -123,7 +121,7 @@ namespace RESTful_API.Repository
             var hash = Rfc2898DeriveBytes.Pbkdf2(
                 Encoding.UTF8.GetBytes(password),
                 salt,
-                35000,
+                count,
                 hashAlgorithm,
                 keySize);
             return Convert.ToHexString(hash);
