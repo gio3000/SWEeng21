@@ -54,20 +54,17 @@ class Admin extends User {
       "name": name,
       "user": {
         "password": password,
-        "first_Name": "first_Name",
         "role": 2,
         "salt": "salt",
-        "initial_Salt": "initial_Salt",
         "hash_Count": 5,
-        "last_Name": "last_Name",
         "initial_Password": password,
         "email": email
       }
     };
     _secretariesNames.add(name);
-    var response = await AuthHttp.post(
-        "http://homenetwork-test.ddns.net:5160/api/secretary",
+    AuthHttp.post("http://homenetwork-test.ddns.net:5160/api/secretary",
         body: jsonEncode(secreatry));
+    await loadSecretaries();
     notifyListeners();
   }
 
@@ -96,18 +93,26 @@ class Admin extends User {
       {required String oldName, required String newName}) async {
     int index = _secretariesNames.indexOf(oldName);
     _secretaries[index]["name"] = newName;
-    debugPrint(_secretaries[index].toString());
-    debugPrint(index.toString());
+    int id = _secretaries[index]["secretaryID"];
+    var body = jsonEncode(_secretaries[index]);
+    AuthHttp.put("http://homenetwork-test.ddns.net:5160/api/secretary/$id",
+        body: body);
   }
 
   void deleteSecretary({required String name}) async {
-    int index = _secretariesNames.indexOf(name);
+    int index = 0;
+    for (int i = 0; i < _secretaries.length; i++) {
+      if (_secretaries[i]["name"] == name) {
+        index = i;
+      }
+    }
+    debugPrint(index.toString());
+    int secretaryID = _secretaries[index]["secretaryID"];
+    debugPrint(secretaryID.toString());
     _secretariesNames.removeAt(index);
-    int id = _secretaries[index]["secretaryID"];
     _secretaries.removeAt(index);
-    debugPrint(_secretaries.toString());
-    var response = await AuthHttp.delete(
-        "http://homenetwork-test.ddns.net:5160/api/secretary/$id");
+    await AuthHttp.delete(
+        "http://homenetwork-test.ddns.net:5160/api/secretary/$secretaryID");
     notifyListeners();
   }
 }
