@@ -69,24 +69,20 @@ class Admin extends User {
   }
 
   void resetSecretaryPassword({required String name}) async {
-    int index = 0;
-    for (int i = 0; i < _secretaries.length; i++) {
-      if (_secretaries[i]["name"] == name) {
-        index = i;
-      }
-    }
-    int userID = _secretaries[index]["userID"];
-    var settings = ConnectionSettings(
-        host: '31.47.240.136',
-        port: 3307,
-        user: 'SWENGUser',
-        password: 'WkvUqQ2@DpCn',
-        db: 'SWENGDB');
-    var conn = await MySqlConnection.connect(settings);
-    await conn.query(
-        'update ${db.userTableName} set ${db.userPasswordKey}=Initial_Password where ${db.userIdKey}=?',
-        [userID]);
-    conn.close();
+    int index = _secretariesNames.indexOf(name);
+    int id = _secretaries[index]["secretaryID"];
+    int uId = _secretaries[index]["user"]["userID"];
+    debugPrint("id: $id");
+    debugPrint("index: $index");
+    var response = await AuthHttp.get(
+        "http://homenetwork-test.ddns.net:5160/api/secretary/$id");
+    var secretary = jsonDecode(response.body);
+    debugPrint("secretary: $secretary");
+    debugPrint("initial password: ${secretary["user"]["initial_Password"]}");
+    secretary["user"]["password"] = secretary["user"]["initial_Password"];
+    debugPrint("changed secretary: $secretary");
+    AuthHttp.put("http://homenetwork-test.ddns.net:5160/api/user/$uId",
+        body: jsonEncode(secretary["user"]));
   }
 
   void changeSecretaryName(
