@@ -7,5 +7,6 @@ namespace RESTful_API.Controllers
     [ApiController]
     public class LecturerLectureController : ControllerBase
     {
+        //TODO
     }
 }

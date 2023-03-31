@@ -1,11 +1,18 @@
 import got from 'got';
+import { JSDOM } from 'jsdom';
+import { Student, DualisModule, DualisLecture, DualisExam } from './classes.js';
 import { gradeStringToPercentPoints, removeModuleDataDuplicates } from './helper.js';
 
-const login = async (credentials) => {
+/**
+ * Logs a student in
+ * @param {Student} student - Student to be logged in
+ * @raises Error if login failed
+ */
+const login = async (student) => {
     const response = await got.post('https://dualis.dhbw.de/scripts/mgrqispi.dll', {
         form: {
-            'usrname': credentials.username,
-            'pass': credentials.password,
+            'usrname': student.email,
+            'pass': student.password,
             'APPNAME': 'CampusNet',
             'PRGNAME': 'LOGINCHECK',
             'ARGUMENTS': 'clino,usrname,pass,menuno,menu_type,browser,platform',
@@ -14,50 +21,68 @@ const login = async (credentials) => {
             'menu_type': 'classic'
         }
     });
-
-    credentials.cookie = response.headers['set-cookie'][0].split(';')[0].replace(' ', '');
-    credentials.arguments = response.headers['refresh'].split('ARGUMENTS=')[1].split(',');
-
-    return credentials;
+    try {
+        student.dualisCredentials.cookie = response.headers['set-cookie'][0].split(';')[0].replace(' ', '');
+        student.dualisCredentials.urlArguments = response.headers['refresh'].split('ARGUMENTS=')[1].split(',');
+    } catch (error) {
+        throw new Error(`Login failed for ${student.email}`);
+    }
 }
 
-const getSemesterArguments = async (credentials) => {
-    const url = `https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=COURSERESULTS&ARGUMENTS=${credentials.arguments.join(',')}`;
+/**
+ * Gets the semester arguments of a student
+ * @param {Student} student - Student to get the semester arguments from 
+ * @returns list of semester arguments
+ */
+const getSemesterArguments = async (student) => {
+    const url = `https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=COURSERESULTS&ARGUMENTS=${student.dualisCredentials.urlArguments.join(',')}`;
     const response = await got.get(url, {
         headers: {
-            'Cookie': credentials.cookie
+            'Cookie': student.dualisCredentials.cookie
         }
     });
 
     let semesterArguments = [];
 
-    let semesterString = response.body.split('<select id="semester"')[1].split('</select>')[0].split('class="tabledata">')[1].replaceAll('\t', '').split('\r\n');
-    for (let i = 0; i < semesterString.length; i++) {
-        if (semesterString[i].includes('option')) {
-            semesterArguments.push(semesterString[i].split('value="')[1].split('"')[0]);
-        }
+    const dom = new JSDOM(response.body);
+
+    let semesterDropdown = dom.window.document.getElementsByTagName('option');
+    for (const option of semesterDropdown) {
+        semesterArguments.push(option.value);
     }
+
     return semesterArguments;
 }
 
-const getModuleData = async (credentials, semesterArguments) => {
-    let moduleData = [];
+/**
+ * Gets the module data of a student
+ * @param {Student} student - Student to get the module data from
+ * @param {string[]} semesterArguments - List of semester arguments
+ * @returns list of module data
+ */
+const getModuleData = async (student, semesterArguments) => {
     const requests = semesterArguments.map(semesterArgument => {
-        const url = `https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=COURSERESULTS&ARGUMENTS=${credentials.arguments.slice(0, 2).join(',')},-N${semesterArgument}`;
+        const url = `https://dualis.dhbw.de/scripts/mgrqispi.dll?APPNAME=CampusNet&PRGNAME=COURSERESULTS&ARGUMENTS=${student.dualisCredentials.urlArguments.slice(0, 2).join(',')},-N${semesterArgument}`;
         return got.get(url, {
             headers: {
-                'Cookie': credentials.cookie
+                'Cookie': student.dualisCredentials.cookie
             }
         });
     });
+
     const responses = await Promise.all(requests);
+
+    let moduleData = [];
+
     for (const response of responses) {
-        let modules = response.body.split('<tbody>')[1].split('</tbody>')[0].replaceAll('\t', '').replaceAll('  ', '').split('</tr>');
-        for (const moduleLine of modules) {
-            if (moduleLine.includes('href')) {
-                let module = {};
-                module.argument = moduleLine.split('dl_popUp("')[1].split('"')[0];
-                module.cts = parseInt(moduleLine.split('"tbdata_numeric">')[1].split('</td>')[0].split(',')[0]);
+        const dom = new JSDOM(response.body);
+        let tableBody = dom.window.document.getElementsByTagName('tbody')[0];
+        let tableRows = tableBody.getElementsByTagName('tr');
+        for (const tableRow of tableRows) {
+            if (tableRow.innerHTML.includes('href')) {
+                const module = {};
+                module.path = tableRow.getElementsByTagName('script')[0].innerHTML.split('dl_popUp("')[1].split('"')[0];
+                module.cts = parseInt(tableRow.getElementsByClassName('tbdata_numeric')[1].innerHTML.split(',')[0]);
                 moduleData.push(module);
             }
         }
@@ -67,63 +92,85 @@ const getModuleData = async (credentials, semesterArguments) => {
     return moduleData;
 }
 
-const getModules = async (credentials, moduleData) => {
-    let modules = [];
+/**
+ * Gets the modules of a student
+ * @param {Student} student - Student to get the modules from
+ * @param {string[]} moduleData - List of module data
+ */
+const getModules = async (student, moduleData) => {
     const requests = moduleData.map(moduleDataObj => {
-        const url = `https://dualis.dhbw.de${moduleDataObj.argument}`;
+        const url = `https://dualis.dhbw.de${moduleDataObj.path}`;
         return got.get(url, {
             headers: {
-                'Cookie': credentials.cookie
+                'Cookie': student.dualisCredentials.cookie
             }
         });
     });
+
     const responses = await Promise.all(requests);
+
     for (let i = 0; i < responses.length; i++) {
         const response = responses[i];
-        let module = {};
-        module.modulename = response.body.split('<h1>')[1].split('&nbsp;\r\n')[1].split(' (')[0];
-        module.cts = moduleData[i].cts;
-        module.lectures = [];
 
-        let gradeTableRows = response.body.split('<table')[1].split('</table>')[0].replaceAll('\t', '').replaceAll('  ', '').split('</tr>');
-        if (gradeTableRows[3].includes('Modulabschlussleistungen')) {
-            if (gradeTableRows[5].includes('Gesamt')) {
+        const dom = new JSDOM(response.body);
+
+        const moduleName = dom.window.document.getElementsByTagName('h1')[0].innerHTML.split('&nbsp;\n')[1].split(' (')[0];
+        const cts = moduleData[i].cts;
+        const module = new DualisModule(moduleName, cts);
+
+        const table = dom.window.document.getElementsByTagName('table')[0];
+        const tableRows = Array.from(table.getElementsByTagName('tr')).slice(3);
+
+        if (tableRows[0].innerHTML.includes('Modulabschlussleistungen')) {
+            if (tableRows[2].innerHTML.includes('Gesamt')) {
                 // Modulabschlussleistungen mit nur einer Note
-                let rowColumns = gradeTableRows[4].split('</td>');
-                let lecture = {};
-                lecture.lecturename = module.modulename;
-                lecture.semester = rowColumns[0].split('">')[1];
-                lecture.countsToAverage = true;
-                let exam = {};
-                let gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
-                exam.first_try = gradeStringToPercentPoints(gradeString);
-                exam.second_try = null;
-                exam.third_try = null;
-                if (gradeTableRows[6].includes('Versuch2')) {
-                    rowColumns = gradeTableRows[8].split('</td>');
-                    gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
-                    exam.second_try = gradeStringToPercentPoints(gradeString);
+                const rowColumns1T = tableRows[1].getElementsByTagName('td');
+
+                const lectureName = module.moduleName;
+                const semester = rowColumns1T[0].innerHTML;
+                const countsToAverage = true;
+
+                const gradeString1T = rowColumns1T[3].innerHTML;
+                const firstTry = gradeStringToPercentPoints(gradeString1T);
+
+                const exam = new DualisExam(firstTry);
+
+                // Parse second try
+                if (tableRows.length > 6 && tableRows[3].innerHTML.includes('Versuch  2')) {
+                    const rowColumns2T = tableRows[5].getElementsByTagName('td');
+                    const gradeString2T = rowColumns2T[3].innerHTML;
+                    const secondTry = gradeStringToPercentPoints(gradeString2T);
+                    exam.addSecondTry(secondTry);
                 }
-                lecture.exam = exam;
-                module.lectures.push(lecture);
+
+                // Parse third try
+                if (tableRows.length > 10 && tableRows[7].innerHTML.includes('Versuch  3')) {
+                    const rowColumns3T = tableRows[9].getElementsByTagName('td');
+                    const gradeString3T = rowColumns3T[3].innerHTML;
+                    const thirdTry = gradeStringToPercentPoints(gradeString3T);
+                    exam.addThirdTry(thirdTry);
+                }
+
+                const lecture = new DualisLecture(lectureName, semester, countsToAverage, exam);
+                module.appendLecture(lecture);
             }
             else {
                 // Modulabschlussleistungen mit mehreren Noten
                 // TODO Parsen bei Versuch 2 machen
-                let semester = gradeTableRows[4].split('</td>')[0].split('">')[1];
-                for (let row of gradeTableRows.slice(5)) {
-                    if (!row.includes('Gesamt')) {
-                        let rowColumns = row.split('</td>');
-                        let lecture = {};
-                        lecture.lecturename = rowColumns[1].split('&nbsp;&nbsp;')[1];
-                        lecture.semester = semester;
-                        lecture.countsToAverage = true;
-                        let exam = {};
-                        exam.first_try = parseInt(rowColumns[3].split('>')[1].split('<')[0].split(',')[0]);
-                        exam.second_try = null;
-                        exam.third_try = null;
-                        lecture.exam = exam;
-                        module.lectures.push(lecture);
+                const semester = tableRows[1].getElementsByTagName('td')[0].innerHTML;
+
+                for (const row of tableRows.slice(2)) {
+                    if (!row.innerHTML.includes('Gesamt')) {
+                        let rowColumns1T = row.getElementsByTagName('td');
+
+                        const lectureName = rowColumns1T[1].innerHTML.replaceAll('&nbsp;&nbsp;', '');
+                        const countsToAverage = true;
+
+                        const firstTry = parseInt(rowColumns1T[3].innerHTML.split(',')[0]);
+                        const exam = new DualisExam(firstTry);
+
+                        const lecture = new DualisLecture(lectureName, semester, countsToAverage, exam);
+                        module.appendLecture(lecture);
                     }
                     else {
                         break;
@@ -133,73 +180,90 @@ const getModules = async (credentials, moduleData) => {
         }
         else {
             // Modul mit mehreren getrennten Vorlesungen
-            // TODO Parsen von Versuch 2 machen
-            gradeTableRows = gradeTableRows.slice(3);
             let tryCount = 1;
-            for (let i = 0; i < gradeTableRows.length / 2; i++) {
-                // Check if lecture already exists when multiple tries
-                let found = false;
-                let lecture = {};
-                lecture.lecturename = gradeTableRows[i * 2].split('">')[1].split(' ').slice(1).join(' ').split(' (')[0].split('</td>')[0];
-                let exam = {};
-                let rowColumns = gradeTableRows[i * 2 + 1].split('</td>');
-                if (tryCount >= 2) {
-                    module.lectures.forEach(lectureElem => {
-                        if (lectureElem.lecturename === lecture.lecturename) {
-                            lecture = lectureElem;
-                            exam = lecture.exam;
-                            found = true;
-                        }
-                    });
-                }
-                if (rowColumns.length > 1) {
-                    lecture.semester = rowColumns[0].split('">')[1];
-                    if (rowColumns[0].includes('Versuch2')) {
+            for (let i = 0; i < tableRows.length / 2; i++) {
+                let rowColumns = tableRows[i * 2 + 1]?.getElementsByTagName('td');
+
+                // Check if row contains data
+                if (rowColumns) {
+                    if (rowColumns[0].innerHTML.includes('Versuch  2')) {
+                        // Indicate that the next lectures are the second try
                         tryCount = 2;
                     }
+                    else if (rowColumns[0].innerHTML.includes('Versuch  3')) {
+                        // Indicate that the next lectures are the third try
+                        tryCount = 3;
+                    }
                     else {
-                        let gradeString = rowColumns[3].replaceAll('\r\n', '').split('>')[1];
-                        const weightage = parseInt(rowColumns[1].split('(')[1].split('%)')[0]);
-                        lecture.countsToAverage = weightage > 0;
+                        // Indicates that this row contains a lecture
+                        let found = false;
+
+                        let lecture = {};
+                        const lectureName = tableRows[i * 2].getElementsByTagName('td')[0].innerHTML.split(' ').slice(1).join(' ').split(' (')[0];
+                        const semester = rowColumns[0].innerHTML;
+                        let countsToAverage = true;
+                        let exam = {};
+
+                        // Check if lecture already exists when multiple tries
+                        if (tryCount >= 2) {
+                            module.lectures.forEach(lectureElem => {
+                                if (lectureElem.lectureName === lectureName) {
+                                    lecture = lectureElem;
+                                    exam = lecture.exam;
+                                    found = true;
+                                }
+                            });
+                        }
+
+                        // Parse grade
+                        const gradeString = rowColumns[3].innerHTML;
+                        const weightage = parseInt(rowColumns[1].innerHTML.split('(')[1].split('%)')[0]);
+                        countsToAverage = weightage > 0;
                         let grade = gradeStringToPercentPoints(gradeString, weightage);
+
+                        // Set exam grade
                         if (tryCount === 1 || !found || exam.first_try === grade) {
-                            exam.first_try = grade;
-                            exam.second_try = null;
-                            exam.third_try = null;
+                            // Create new exam if it is the first try or if the exam does not exist yet or if the grade is the same as the first try (e.g. when the second lecture is not passed, then the first lecture is again displayed)
+                            exam = new DualisExam(grade);
                         }
                         else if (tryCount === 2) {
-                            exam.second_try = grade;
+                            exam.addSecondTry(grade);
+                        }
+                        else if (tryCount === 3) {
+                            exam.addThirdTry(grade);
                         }
                         if (gradeString.includes('b')) {
                             // Modul/Prüfungsleistung ist bestanden aber hat keine Note, wird also nicht bewertet
-                            // TODO Besseren Weg finden um festzuhalten
-                            lecture.countsToAverage = false;
+                            countsToAverage = false;
                         }
-                        lecture.exam = exam;
-                        if (tryCount === 1) {
+                        if (!found) {
+                            lecture = new DualisLecture(lectureName, semester, countsToAverage, exam);
                             module.lectures.push(lecture);
                         }
                     }
                 }
             }
         }
+
         // set countsToAverage to false if module is not graded
         if (module.cts === 0) {
             for (let lecture of module.lectures) {
                 lecture.countsToAverage = false;
             }
         }
-        modules.push(module);
+        student.appendDualisModule(module);
     }
-    return modules;
 }
 
-const fetch = async (credentials) => {
-    credentials = await login(credentials);
-    const semesterArguments = await getSemesterArguments(credentials);
-    const moduleData = await getModuleData(credentials, semesterArguments);
-    const modules = await getModules(credentials, moduleData);
-    return modules;
+/**
+ * Fetches all modules of a student from dualis
+ * @param {Student} student - The student to fetch the modules for
+ */
+const fetchModules = async (student) => {
+    await login(student);
+    const semesterArguments = await getSemesterArguments(student);
+    const moduleData = await getModuleData(student, semesterArguments);
+    await getModules(student, moduleData);
 }
 
-export default fetch;
+export default fetchModules;

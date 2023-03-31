@@ -58,7 +58,7 @@ namespace RESTful_API.Repository
             try
             {
                 Lecture? lecture = _dbContext.Lectures
-                    .Include(m => m.ModuleID)
+                    .Include(l => l.Module)
                     .Single(l => l.LectureID == id);
                 if (lecture != null)
                 {
@@ -80,7 +80,7 @@ namespace RESTful_API.Repository
             try
             {
                 return _dbContext.Lectures
-                    .Include(m => m.ModuleID)
+                    .Include(l => l.Module)
                     .ToList();
             }
             catch

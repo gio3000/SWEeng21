@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using RESTful_API.Interface;
 using RESTful_API.Models;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace RESTful_API.Repository
 {
@@ -98,6 +100,22 @@ namespace RESTful_API.Repository
         public bool CheckUser(int id)
         {
             return _dbContext.Users.Any(e => e.UserID == id);
+        }
+
+        public string HashPasword(string password, out byte[] salt, int count)
+        {
+            const int keySize = 32;
+            const int iterations = 350000;
+            HashAlgorithmName hashAlgorithm = HashAlgorithmName.SHA512;
+
+            salt = RandomNumberGenerator.GetBytes(keySize);
+            var hash = Rfc2898DeriveBytes.Pbkdf2(
+                Encoding.UTF8.GetBytes(password),
+                salt,
+                count,
+                hashAlgorithm,
+                keySize);
+            return Convert.ToHexString(hash);
         }
     }
 }

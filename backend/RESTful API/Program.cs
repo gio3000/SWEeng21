@@ -16,6 +16,15 @@ builder.Services.AddDbContext<DatabaseContext>
 
 // Interface and Repository Mapping
 builder.Services.AddTransient<IAdmin, AdminRepository>();
+builder.Services.AddTransient<ICourse, CourseRepository>();
+builder.Services.AddTransient<ICourseModuleRel, CourseModuleRelRepository>();
+builder.Services.AddTransient<IExam, ExamRepository>();
+builder.Services.AddTransient<ILecture, LectureRepository>();
+builder.Services.AddTransient<ILecturer, LecturerRepository>();
+builder.Services.AddTransient<ILecturerLectureRel, LecturerLectureRelRepository>();
+builder.Services.AddTransient<IModule, ModuleRepository>();
+builder.Services.AddTransient<ISecretary, SecretaryRepository>();
+builder.Services.AddTransient<IStudent, StudentRepository>();
 builder.Services.AddTransient<IUsers, UserRepository>();
 
 builder.Services.AddControllers();
@@ -37,6 +46,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "MyPolicy",
+                policy =>
+                {
+                    policy.WithOrigins("*")
+                            .WithHeaders("*")
+                            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+                });
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -47,6 +68,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors();
 
 app.UseAuthorization();
 

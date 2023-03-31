@@ -6,12 +6,14 @@ import crypto from 'crypto';
  * @param {string} courseName - Name of the course
  * @param {number} secretaryId - Id of the secretary
  * @param {Student[]} students - List of students
+ * @param {CourseModule[]} courseModules - List of course modules
  */
 class Course {
     constructor(courseName, secretaryId) {
         this.courseName = courseName;
         this.secretaryId = secretaryId;
         this.students = [];
+        this.courseModules = [];
     }
 
     /**
@@ -20,6 +22,22 @@ class Course {
      */
     appendStudent(student) {
         this.students.push(student);
+    }
+
+    /**
+     * Sets the course id from the database
+     * @param {number} courseId 
+     */
+    setCourseId(courseId) {
+        this.courseId = courseId;
+    }
+
+    /**
+     * Adds a course module to the course
+     * @param {CourseModule} courseModule - Course module to be added to the course
+     */
+    appendCourseModule(courseModule) {
+        this.courseModules.push(courseModule);
     }
 }
 
@@ -35,7 +53,10 @@ class Course {
  * @param {string} salt - Salt for the password
  * @param {string} hash - Hashed password
  * @param {string} matriculationNumber - Matriculation number of the student
- * @param {Module[]} modules - List of modules
+ * @param {number} userId - Id of the user in the database
+ * @param {number} studentId - Id of the student in the database
+ * @param {DualisModule[]} modules - List of dualis modules
+ * @param {Object} dualisCredentials - Dualis credentials of the student
  */
 class Student {
     constructor(firstName, lastName, email, password, matriculationNumber) {
@@ -45,31 +66,59 @@ class Student {
         this.email = email;
         this.password = password;
         this.salt = crypto.randomBytes(16).toString('hex');
-        this.hashcount = Math.floor(Math.random() * 1000) + 1;
+        this.hashcount = Math.floor(Math.random() * 20) + 1;
         for (let i = 0; i < this.hashcount; i++) {
             this.hash = crypto.createHmac('sha256', this.salt).update(this.password).digest('hex');
         }
         this.matriculationNumber = matriculationNumber;
-        this.modules = [];
+        this.userId = null;
+        this.studentId = null;
+        this.dualisModules = [];
+        this.dualisCredentials = { cookie: '', urlArguments: [] };
     }
 
     /**
      * Adds a module to the student
-     * @param {Module} module - Module to be added to the student
+     * @param {DualisModule} dualisModule - Module to be added to the student
      */
-    appendModule(module) {
-        this.modules.push(module);
+    appendDualisModule(dualisModule) {
+        this.dualisModules.push(dualisModule);
+    }
+
+    /**
+     * Sets the dualis credentials of the student
+     * @param {string} cookie - Cookie of the student
+     * @param {string[]} urlArguments - UrlArguments of the student
+     */
+    setDualisCredentials(cookie, urlArguments) {
+        this.dualisCredentials = { cookie, urlArguments };
+    }
+
+    /**
+     * Sets the user id from the database
+     * @param {number} userId
+     */
+    setUserId(userId) {
+        this.userId = userId;
+    }
+
+    /**
+     * Sets the student id from the database
+     * @param {number} studentId
+     */
+    setStudentId(studentId) {
+        this.studentId = studentId;
     }
 }
 
 /**
- * Represents a module
+ * Represents a module from dualis
  * @class
  * @param {string} moduleName - Name of the module
  * @param {string} cts - CTS of the module
- * @param {Lecture[]} lectures - List of lectures
+ * @param {DualisLecture[]} lectures - List of lectures
  */
-class Module {
+class DualisModule {
     constructor(moduleName, cts) {
         this.moduleName = moduleName;
         this.cts = cts;
@@ -86,14 +135,14 @@ class Module {
 }
 
 /**
- * Represents a lecture
+ * Represents a lecture from dualis
  * @class
  * @param {string} lectureName - Name of the lecture
  * @param {string} semester - Semester of the lecture
  * @param {boolean} countsToAverage - Whether the lecture counts to the average
- * @param {Exam} exam - Exam of the lecture
+ * @param {DualisExam} exam - Exam of the lecture
  */
-class Lecture {
+class DualisLecture {
     constructor(lectureName, semester, countsToAverge, exam) {
         this.lectureName = lectureName;
         this.semester = semester;
@@ -103,13 +152,13 @@ class Lecture {
 }
 
 /**
- * Represents an exam
+ * Represents an exam from dualis
  * @class
  * @param {number} firstTry - First try of the exam
  * @param {number} secondTry - Second try of the exam
  * @param {number} thirdTry - Third try of the exam
  */
-class Exam {
+class DualisExam {
     constructor(firstTry) {
         this.firstTry = firstTry;
         this.secondTry = null;
@@ -133,4 +182,69 @@ class Exam {
     }
 }
 
-export { Course, Student, Module, Lecture, Exam };
+/**
+ * Represents a module for the course
+ * @class
+ * @param {string} moduleName - Name of the module
+ * @param {string} cts - CTS of the module
+ * @param {CourseLecture[]} lectures - List of lectures
+ */
+class CourseModule {
+    constructor(moduleName, cts) {
+        this.moduleName = moduleName;
+        this.cts = cts;
+        this.lectures = [];
+    }
+
+    /**
+     * Adds a lecture to the module
+     * @param {CourseLecture} lecture - Lecture to be added to the module
+     */
+    appendLecture(lecture) {
+        this.lectures.push(lecture);
+    }
+}
+
+/**
+ * Represents a lecture for the course
+ * @class
+ * @param {string} lectureName - Name of the lecture
+ * @param {string} semester - Semester of the lecture
+ * @param {boolean} countsToAverage - Whether the lecture counts to the average
+ * @param {CourseExam[]} exams - List of exams
+ */
+class CourseLecture {
+    constructor(lectureName, semester, countsToAverge) {
+        this.lectureName = lectureName;
+        this.semester = semester;
+        this.countsToAverage = countsToAverge;
+        this.exams = [];
+    }
+
+    /**
+     * Adds an exam to the lecture
+     * @param {CourseExam} exam - Exam to be added to the lecture
+     */
+    appendExam(exam) {
+        this.exams.push(exam);
+    }
+}
+
+/**
+ * Represents an exam for the course
+ * @class
+ * @param {number} studentId - Id of the student
+ * @param {number} firstTry - First try of the exam
+ * @param {number} secondTry - Second try of the exam
+ * @param {number} thirdTry - Third try of the exam
+ */
+class CourseExam {
+    constructor(studentId, firstTry, secondTry, thirdTry) {
+        this.studentId = studentId;
+        this.firstTry = firstTry;
+        this.secondTry = secondTry;
+        this.thirdTry = thirdTry;
+    }
+}
+
+export { Course, Student, DualisModule, DualisLecture, DualisExam, CourseModule, CourseLecture, CourseExam };
