@@ -61,7 +61,7 @@ namespace RESTful_API.Controllers
 
                     var response = new[]
                     {
-                        new {Token = new JwtSecurityTokenHandler().WriteToken(token), User = user}
+                        new {Token = new JwtSecurityTokenHandler().WriteToken(token), User = user, ID = FetchID(user.UserID, user.Role.ToString())}
                     };
 
                     return Ok(JsonConvert.SerializeObject(response));
@@ -80,6 +80,23 @@ namespace RESTful_API.Controllers
         private async Task<User> UserLogin(string email, string password)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+        }
+
+        private int FetchID(int id, string role)
+        {
+            switch (role)
+            {
+                case "Admin":
+                    return _context.Admins.Where(a => a.UserID == id).Select(y => y.AdminID).Single();
+                case "Student":
+                    return _context.Students.Where(a => a.UserID == id).Select(y => y.StudentID).Single();
+                case "Lecturer":
+                    return _context.Lecturers.Where(a => a.UserID == id).Select(y => y.LecturerID).Single();
+                case "Secretary":
+                    return _context.Secretarys.Where(a => a.UserID == id).Select(y => y.SecretaryID).Single();
+                default: return 0;
+            }
+            
         }
     }
 }
