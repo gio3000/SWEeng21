@@ -13,14 +13,18 @@ class Admin extends User {
   ];
   bool isReady = false;
   List<dynamic> _secretaries = [];
+
+  final int adminId;
+
   Admin({
-    required int id,
+    required this.adminId,
+    required int userId,
     required String firstName,
     required String lastName,
     required UserRole role,
     required String email,
   }) : super(
-            id: id,
+            id: userId,
             firstName: firstName,
             lastName: lastName,
             role: role,

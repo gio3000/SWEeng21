@@ -5,17 +5,17 @@ import 'package:frontend/provider/user.dart';
 class Student extends User {
   final List<GradeSubjectMapper> dummyGrades = [];
 
-  //TODO set id when backend works
-  int studentId = -1;
+  final int studentId;
 
   Student({
-    required int id,
+    required int userId,
     required String firstName,
     required String lastName,
     required UserRole role,
     required String email,
+    required this.studentId,
   }) : super(
-            id: id,
+            id: userId,
             firstName: firstName,
             lastName: lastName,
             role: role,

@@ -12,19 +12,19 @@ class Secretary extends User {
     '22020202'
   ];
 
-  //TODO needs to be set if backend works
-  int secretaryId = -1;
+  final int secretaryId;
 
   final List<String> lecturers = [];
 
   Secretary({
-    required int id,
+    required this.secretaryId,
+    required int userId,
     required String firstName,
     required String lastName,
     required UserRole role,
     required String email,
   }) : super(
-            id: id,
+            id: userId,
             firstName: firstName,
             lastName: lastName,
             role: role,

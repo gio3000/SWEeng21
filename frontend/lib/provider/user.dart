@@ -4,7 +4,7 @@ import '../utils/constants.dart' as constants;
 import '../utils/db_constants.dart' as db;
 
 class User with ChangeNotifier {
-  final int id;
+  int id;
   String firstName;
   String lastName;
   String email;

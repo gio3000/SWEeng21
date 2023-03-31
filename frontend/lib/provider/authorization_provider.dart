@@ -53,33 +53,38 @@ class AuthorizationProvider with ChangeNotifier {
           parsedResponse[0][db.userTableName] as Map<String, Object?>?;
       if (userData == null) throw AuthorizationException();
       UserRole role = UserRole.values[userData[db.userRoleKey] as int];
+      int dbRoleId = parsedResponse[0][db.tokenRoleId] as int? ?? 0;
+      if (dbRoleId == 0) throw AuthorizationException();
 
       //set authorizedUser
       switch (role) {
         case UserRole.student:
           authorizedUser = Student(
+            studentId: dbRoleId,
             email: userData[db.userEmailKey] as String? ?? '',
             firstName: userData[db.userFirstNameKey] as String? ?? '',
             lastName: userData[db.userLastNameKey] as String? ?? '',
-            id: userData[db.userIdKey] as int? ?? 0,
+            userId: userData[db.userIdKey] as int? ?? 0,
             role: role,
           );
           break;
         case UserRole.secretary:
           authorizedUser = Secretary(
+            secretaryId: dbRoleId,
             email: userData[db.userEmailKey] as String? ?? '',
             firstName: userData[db.userFirstNameKey] as String? ?? '',
             lastName: userData[db.userLastNameKey] as String? ?? '',
-            id: userData[db.userIdKey] as int? ?? 0,
+            userId: userData[db.userIdKey] as int? ?? 0,
             role: role,
           );
           break;
         case UserRole.admin:
           authorizedUser = Admin(
+            adminId: dbRoleId,
             email: userData[db.userEmailKey] as String? ?? '',
             firstName: userData[db.userFirstNameKey] as String? ?? '',
             lastName: userData[db.userLastNameKey] as String? ?? '',
-            id: userData[db.userIdKey] as int? ?? 0,
+            userId: userData[db.userIdKey] as int? ?? 0,
             role: role,
           );
           break;
@@ -93,7 +98,11 @@ class AuthorizationProvider with ChangeNotifier {
 
   void logout() {
     authorizationToken = null;
+    authorizedUser?.id = 0;
     authorizedUser?.role = UserRole.invalid;
-    notifyListeners();
+    authorizedUser?.email = '';
+    authorizedUser?.firstName = '';
+    authorizedUser?.lastName = '';
+    authorizedUser?.notifyListeners();
   }
 }

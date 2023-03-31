@@ -11,3 +11,4 @@ const userPasswordKey = 'Password';
 
 //Token
 const tokenKey = "Token";
+const tokenRoleId = "ID";
