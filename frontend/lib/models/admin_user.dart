@@ -58,24 +58,48 @@ class Admin extends User {
       "name": name,
       "user": {
         "password": password,
-        "first_Name": "first_Name",
         "role": 2,
         "salt": "salt",
-        "initial_Salt": "initial_Salt",
         "hash_Count": 5,
-        "last_Name": "last_Name",
         "initial_Password": password,
         "email": email
       }
     };
     _secretariesNames.add(name);
-    var response = await AuthHttp.post(
-        "http://homenetwork-test.ddns.net:5160/api/secretary",
+    AuthHttp.post("http://homenetwork-test.ddns.net:5160/api/secretary",
         body: jsonEncode(secreatry));
+    await loadSecretaries();
     notifyListeners();
   }
 
   void resetSecretaryPassword({required String name}) async {
+    int index = _secretariesNames.indexOf(name);
+    int id = _secretaries[index]["secretaryID"];
+    int uId = _secretaries[index]["user"]["userID"];
+    debugPrint("id: $id");
+    debugPrint("index: $index");
+    var response = await AuthHttp.get(
+        "http://homenetwork-test.ddns.net:5160/api/secretary/$id");
+    var secretary = jsonDecode(response.body);
+    debugPrint("secretary: $secretary");
+    debugPrint("initial password: ${secretary["user"]["initial_Password"]}");
+    secretary["user"]["password"] = secretary["user"]["initial_Password"];
+    debugPrint("changed secretary: $secretary");
+    AuthHttp.put("http://homenetwork-test.ddns.net:5160/api/user/$uId",
+        body: jsonEncode(secretary["user"]));
+  }
+
+  void changeSecretaryName(
+      {required String oldName, required String newName}) async {
+    int index = _secretariesNames.indexOf(oldName);
+    _secretaries[index]["name"] = newName;
+    int id = _secretaries[index]["secretaryID"];
+    var body = jsonEncode(_secretaries[index]);
+    AuthHttp.put("http://homenetwork-test.ddns.net:5160/api/secretary/$id",
+        body: body);
+  }
+
+  void deleteSecretary({required String name}) async {
     int index = 0;
     for (int i = 0; i < _secretaries.length; i++) {
       if (_secretaries[i]["name"] == name) {
@@ -83,35 +107,10 @@ class Admin extends User {
       }
     }
     int userID = _secretaries[index]["userID"];
-    var settings = ConnectionSettings(
-        host: '31.47.240.136',
-        port: 3307,
-        user: 'SWENGUser',
-        password: 'WkvUqQ2@DpCn',
-        db: 'SWENGDB');
-    var conn = await MySqlConnection.connect(settings);
-    await conn.query(
-        'update ${db.userTableName} set ${db.userPasswordKey}=Initial_Password where ${db.userIdKey}=?',
-        [userID]);
-    conn.close();
-  }
-
-  void changeSecretaryName(
-      {required String oldName, required String newName}) async {
-    int index = _secretariesNames.indexOf(oldName);
-    _secretaries[index]["name"] = newName;
-    debugPrint(_secretaries[index].toString());
-    debugPrint(index.toString());
-  }
-
-  void deleteSecretary({required String name}) async {
-    int index = _secretariesNames.indexOf(name);
     _secretariesNames.removeAt(index);
-    int id = _secretaries[index]["secretaryID"];
     _secretaries.removeAt(index);
-    debugPrint(_secretaries.toString());
-    var response = await AuthHttp.delete(
-        "http://homenetwork-test.ddns.net:5160/api/secretary/$id");
+    await AuthHttp.delete(
+        "http://homenetwork-test.ddns.net:5160/api/user/$userID");
     notifyListeners();
   }
 }

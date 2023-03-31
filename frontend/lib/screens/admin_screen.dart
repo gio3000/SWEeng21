@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:frontend/provider/authorization_provider.dart';
 import 'package:frontend/screens/login_screen.dart';
@@ -33,8 +35,7 @@ class _TechnicalAdministrator extends State<TechnicalAdministratorScreen> {
   List<int> secretaryWithResetedPassword = [];
 
   ///generates initial List with Secretariats while no database connection exists
-  List<String> secretariatsNames =
-      List.generate(10, (index) => 'Sekretariat ${index + 1}');
+  List<String> secretariatsNames =[];
 
   ///calls AlertDialog if delete button pressed
   void callDeleteAlert(String content, int index) {
