@@ -102,13 +102,11 @@ class Admin extends User {
         index = i;
       }
     }
-    debugPrint(index.toString());
-    int secretaryID = _secretaries[index]["secretaryID"];
-    debugPrint(secretaryID.toString());
+    int userID = _secretaries[index]["userID"];
     _secretariesNames.removeAt(index);
     _secretaries.removeAt(index);
     await AuthHttp.delete(
-        "http://homenetwork-test.ddns.net:5160/api/secretary/$secretaryID");
+        "http://homenetwork-test.ddns.net:5160/api/user/$userID");
     notifyListeners();
   }
 }
