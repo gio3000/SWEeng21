@@ -19,9 +19,9 @@ class GradeSubjectListTile extends StatelessWidget {
       elevation: 2,
       child: ListTile(
         title: Text(mapper.subjectName),
-        subtitle: Text(
-          DateFormat.yMd().format(mapper.examDate),
-        ),
+        // subtitle: Text(
+        //   DateFormat.yMd().format(mapper.examDate),
+        // ),
         trailing: Text(
           mapper.grade.toString(),
           style: const TextStyle(

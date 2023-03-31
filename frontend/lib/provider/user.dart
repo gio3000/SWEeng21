@@ -33,10 +33,10 @@ class User with ChangeNotifier {
           "http://homenetwork-test.ddns.net:5160/api/user/$id");
       if (response.statusCode == 200) {
         var user = jsonDecode(response.body);
-        if (user["password"] != oldPwd) {
+        if (user[db.userPasswordKeySmall] != oldPwd) {
           throw Exception('Old password is incorrect');
         } else {
-          user["password"] = newPwdOne;
+          user[db.userPasswordKeySmall] = newPwdOne;
           await AuthHttp.put(
               "http://homenetwork-test.ddns.net:5160/api/user/$id",
               body: jsonEncode(user));

@@ -11,6 +11,26 @@ class Secretary extends User {
     '18392841',
     '22020202'
   ];
+  final List<GradeSubjectMapper> dummyModules = [
+    const GradeSubjectMapper(
+      subjectName: 'Sysprog',
+      grade: 0,
+      creditPoints: 3,
+      isCompleted: true,
+    ),
+    const GradeSubjectMapper(
+      subjectName: 'Mathe',
+      grade: 0,
+      creditPoints: 9,
+      isCompleted: true,
+    ),
+    const GradeSubjectMapper(
+      subjectName: 'Python',
+      grade: 0,
+      creditPoints: 5,
+      isCompleted: true,
+    ),
+  ];
 
   final int secretaryId;
 
@@ -65,6 +85,20 @@ class Secretary extends User {
     addStudentToCourse(matrikelNr, '');
   }
 
+  Future<void> addModule({required String moduleName, required int cts}) async {
+    dummyModules.add(GradeSubjectMapper(
+        subjectName: moduleName,
+        grade: 0.0,
+        creditPoints: cts,
+        isCompleted: false));
+    notifyListeners();
+  }
+
+  Future<void> removeModule({required String moduleName}) async {
+    dummyModules.removeWhere((element) => moduleName == element.subjectName);
+    notifyListeners();
+  }
+
   //TODO add backend connection
   Future<void> addCourse({required String courseTitle}) async {
     dummyCourses.add(courseTitle);
@@ -96,29 +130,8 @@ class Secretary extends User {
 
   //TODO add backend connection
   Future<List<GradeSubjectMapper>> getAllModules() async {
-    return [
-      GradeSubjectMapper(
-        subjectName: 'Sysprog',
-        grade: 0,
-        examDate: DateTime.now(),
-        creditPoints: 3,
-        isCompleted: true,
-      ),
-      GradeSubjectMapper(
-        subjectName: 'Mathe',
-        grade: 0,
-        examDate: DateTime.now(),
-        creditPoints: 9,
-        isCompleted: true,
-      ),
-      GradeSubjectMapper(
-        subjectName: 'Python',
-        grade: 0,
-        examDate: DateTime.now(),
-        creditPoints: 5,
-        isCompleted: true,
-      ),
-    ];
+    await Future.delayed(const Duration(seconds: 1));
+    return dummyModules;
   }
 
   //TODO add backend connection
